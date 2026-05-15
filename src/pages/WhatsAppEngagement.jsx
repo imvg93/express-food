@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, Send, CheckCheck, BadgeIndianRupee, UserCheck, Mail } from 'lucide-react'
+import { MessageCircle, Send, CheckCheck, BadgeIndianRupee, UserCheck, Mail, ExternalLink } from 'lucide-react'
 import PhoneFrame from '../components/PhoneFrame.jsx'
 import HelperBanner from '../components/HelperBanner.jsx'
 import { whatsappMessages, reengagementStats, restaurant } from '../data/sampleData.js'
@@ -113,6 +114,20 @@ export default function WhatsAppEngagement() {
                       }`}
                     >
                       {b.text}
+                      {b.link && (
+                        <Link
+                          to={b.link.to}
+                          className="mt-1.5 flex items-center justify-between gap-2 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-[12px] font-medium text-emerald-700 ring-1 ring-emerald-100 hover:bg-emerald-100"
+                        >
+                          <span className="inline-flex items-center gap-1.5">
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            {b.link.label}
+                          </span>
+                          <span className="truncate text-[10px] font-normal text-emerald-600/80">
+                            spicejunction.app{b.link.to}
+                          </span>
+                        </Link>
+                      )}
                       <div className="mt-0.5 flex items-center justify-end gap-0.5 text-[10px] text-slate-400">
                         {timeFor(i)}
                         {b.from === 'us' && <CheckCheck className="h-3 w-3 text-emerald-500" />}

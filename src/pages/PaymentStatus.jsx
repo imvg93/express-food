@@ -8,7 +8,7 @@ import StatusBadge from '../components/StatusBadge.jsx'
 export default function PaymentStatus() {
   return (
     <div className="flex flex-col-reverse gap-8 md:grid md:grid-cols-[1fr_auto] md:items-start">
-      <div className="max-w-md">
+      <div className="hidden max-w-md md:block">
         <h1 className="text-xl font-semibold text-slate-900">Payment status</h1>
         <p className="mt-1.5 text-sm text-slate-500">
           Confirmation screen the customer sees right after payment.

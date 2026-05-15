@@ -96,7 +96,8 @@ export const whatsappMessages = [
     preview: 'Your token T-1042 is being prepared. Estimated 4 min more.',
     body: [
       { from: 'us', text: 'Hi Rahul! Your order T-1042 is being prepared 🍳' },
-      { from: 'us', text: 'Estimated ready in ~4 min. We\'ll ping you when it\'s ready.' }
+      { from: 'us', text: 'Estimated ready in ~4 min. We\'ll ping you when it\'s ready.' },
+      { from: 'us', text: 'Track live status anytime →', link: { label: 'View my order', to: '/tracking?type=dine-in&t=T-1042' } }
     ]
   },
   {
@@ -107,7 +108,8 @@ export const whatsappMessages = [
     preview: 'You\'re within 3 km — we\'ve started cooking your order.',
     body: [
       { from: 'us', text: 'Hi Sneha! You\'re 2.8 km away — kitchen has started preparing your Express order ✅' },
-      { from: 'us', text: 'Order will be hot and ready at the counter when you arrive.' }
+      { from: 'us', text: 'Order will be hot and ready at the counter when you arrive.' },
+      { from: 'us', text: 'Open the live tracker →', link: { label: 'View my order', to: '/tracking?type=express&t=E-1052' } }
     ]
   },
   {
@@ -131,6 +133,7 @@ export const whatsappMessages = [
     body: [
       { from: 'us', text: 'Hi Karan, your parcel P-2029 is ready for pickup 🛍️' },
       { from: 'us', text: 'Please show the token at the counter to collect.' },
+      { from: 'us', text: 'Open the parcel tracker →', link: { label: 'View my order', to: '/tracking?type=parcel&t=P-2029' } },
       { from: 'them', text: 'Reaching in 5 min, thanks!' }
     ]
   }

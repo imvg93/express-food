@@ -1,16 +1,26 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Truck, MapPin, ArrowRight, Leaf, Drumstick } from 'lucide-react'
+import { Truck, MapPin, ArrowRight, Leaf, Drumstick, User, Phone, MessageCircle, ArrowLeft } from 'lucide-react'
 import PhoneFrame from '../components/PhoneFrame.jsx'
 import HelperBanner from '../components/HelperBanner.jsx'
 import UpsellCard from '../components/UpsellCard.jsx'
 import { menu } from '../data/sampleData.js'
 
 export default function ExpressFood() {
+  const [step, setStep] = useState(1) // 1 = contact, 2 = menu
+  const [name, setName] = useState('')
+  const [mobile, setMobile] = useState('')
+  const [whatsappDifferent, setWhatsappDifferent] = useState(false)
+  const [whatsapp, setWhatsapp] = useState('')
   const [qty, setQty] = useState({})
   const [arrival, setArrival] = useState('30 min')
   const [note, setNote] = useState('')
+
+  const nameValid  = name.trim().length >= 2
+  const phoneValid = /^\d{10}$/.test(mobile)
+  const waValid    = !whatsappDifferent || /^\d{10}$/.test(whatsapp)
+  const canContinue = nameValid && phoneValid && waValid
 
   const setItemQty = (id, n) => setQty(q => ({ ...q, [id]: Math.max(0, n) }))
 
@@ -24,7 +34,7 @@ export default function ExpressFood() {
 
   return (
     <div className="flex flex-col-reverse gap-8 md:grid md:grid-cols-[1fr_auto] md:items-start">
-      <div className="max-w-md">
+      <div className="hidden max-w-md md:block">
         <h1 className="text-xl font-semibold text-slate-900">Express food booking</h1>
         <p className="mt-1.5 text-sm text-slate-500">
           Highway customers pre-book food and pay in advance. The kitchen only starts
@@ -61,7 +71,101 @@ export default function ExpressFood() {
           </div>
           <div>
             <div className="text-sm font-semibold text-slate-900">Express Food</div>
-            <div className="text-[11px] text-slate-500">Pre-order before you arrive</div>
+            <div className="text-[11px] text-slate-500">
+              {step === 1 ? 'Tell us who you are' : 'Pre-order before you arrive'}
+            </div>
+          </div>
+        </div>
+
+        {step === 1 && (
+          <motion.div
+            key="contact"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="mt-4 space-y-3"
+          >
+            <ContactField label="Your name" icon={User}>
+              <input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="e.g. Rahul Sharma"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+              />
+            </ContactField>
+
+            <ContactField label="Mobile number" icon={Phone}>
+              <input
+                value={mobile}
+                onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="10-digit mobile"
+                inputMode="numeric"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+              />
+            </ContactField>
+
+            <div className="rounded-lg bg-white px-3 py-2.5 ring-1 ring-slate-200">
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="flex items-center gap-2 text-sm text-slate-700">
+                  <MessageCircle className="h-4 w-4 text-emerald-500" />
+                  WhatsApp number is different
+                </span>
+                <Toggle
+                  checked={whatsappDifferent}
+                  onChange={() => setWhatsappDifferent(v => !v)}
+                />
+              </label>
+
+              {whatsappDifferent && (
+                <div className="mt-2.5 flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 ring-1 ring-inset ring-slate-200">
+                  <MessageCircle className="h-4 w-4 text-emerald-500" />
+                  <input
+                    value={whatsapp}
+                    onChange={e => setWhatsapp(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    placeholder="WhatsApp number"
+                    inputMode="numeric"
+                    className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+                  />
+                </div>
+              )}
+
+              <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+                We'll send your order updates to WhatsApp.
+              </p>
+            </div>
+
+            <button
+              onClick={() => canContinue && setStep(2)}
+              disabled={!canContinue}
+              className={`flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                canContinue
+                  ? 'bg-accent-500 text-white shadow-soft hover:bg-accent-600'
+                  : 'cursor-not-allowed bg-slate-100 text-slate-400'
+              }`}
+            >
+              Continue to menu <ArrowRight className="h-4 w-4" />
+            </button>
+
+            <HelperBanner>
+              Express orders need your number so the kitchen can confirm and notify
+              you when food is ready at the counter.
+            </HelperBanner>
+          </motion.div>
+        )}
+
+        {step === 2 && (
+        <>
+        <div className="mt-3 flex items-center justify-between text-xs">
+          <button
+            onClick={() => setStep(1)}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Edit details
+          </button>
+          <div className="min-w-0 truncate text-right text-slate-500">
+            <span className="font-medium text-slate-700">{name.trim()}</span>
+            <span className="mx-1.5 text-slate-300">·</span>
+            +91 {mobile.replace(/(\d{5})(\d{5})/, '$1 $2')}
           </div>
         </div>
 
@@ -141,6 +245,8 @@ export default function ExpressFood() {
             so your order is fresh on arrival.
           </HelperBanner>
         </div>
+        </>
+        )}
       </PhoneFrame>
     </div>
   )
@@ -152,6 +258,38 @@ function Field({ label, children }) {
       <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
       {children}
     </label>
+  )
+}
+
+function ContactField({ label, icon: Icon, children }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
+      <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 focus-within:border-accent-400 focus-within:ring-2 focus-within:ring-orange-100">
+        {Icon && <Icon className="h-4 w-4 text-slate-400" />}
+        {children}
+      </div>
+    </label>
+  )
+}
+
+function Toggle({ checked, onChange }) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      className={`relative h-5 w-9 flex-shrink-0 rounded-full transition ${
+        checked ? 'bg-accent-500' : 'bg-slate-300'
+      }`}
+      aria-pressed={checked}
+    >
+      <motion.span
+        layout
+        className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow"
+        style={{ left: checked ? '20px' : '2px' }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      />
+    </button>
   )
 }
 

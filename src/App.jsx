@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import CustomerQR from './pages/CustomerQR.jsx'
@@ -6,13 +7,23 @@ import ExpressFood from './pages/ExpressFood.jsx'
 import ParcelOrder from './pages/ParcelOrder.jsx'
 import PaymentStatus from './pages/PaymentStatus.jsx'
 import OrderTracking from './pages/OrderTracking.jsx'
-import AdminDashboard from './pages/AdminDashboard.jsx'
+import CheckOrder from './pages/CheckOrder.jsx'
 import KitchenScreen from './pages/KitchenScreen.jsx'
 import StaffScreen from './pages/StaffScreen.jsx'
 import TodaysOrders from './pages/TodaysOrders.jsx'
 import DisplayBoard from './pages/DisplayBoard.jsx'
 import HighwayBoard from './pages/HighwayBoard.jsx'
 import WhatsAppEngagement from './pages/WhatsAppEngagement.jsx'
+
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'))
+
+function PageFallback() {
+  return (
+    <div className="flex h-[60vh] items-center justify-center text-sm text-slate-400">
+      Loading…
+    </div>
+  )
+}
 
 export default function App() {
   return (
@@ -25,7 +36,12 @@ export default function App() {
         <Route path="/parcel"   element={<ParcelOrder />} />
         <Route path="/payment"  element={<PaymentStatus />} />
         <Route path="/tracking" element={<OrderTracking />} />
-        <Route path="/admin"    element={<AdminDashboard />} />
+        <Route path="/check"    element={<CheckOrder />} />
+        <Route path="/admin"    element={
+          <Suspense fallback={<PageFallback />}>
+            <AdminDashboard />
+          </Suspense>
+        } />
         <Route path="/kitchen"  element={<KitchenScreen />} />
         <Route path="/staff"    element={<StaffScreen />} />
         <Route path="/orders"   element={<TodaysOrders />} />

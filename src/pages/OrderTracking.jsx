@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Check, Loader2, Users, Clock, Truck, ShoppingBag, Ticket } from 'lucide-react'
+import { Check, Loader2, Users, Clock, Truck, ShoppingBag, Ticket, Radio } from 'lucide-react'
 import PhoneFrame from '../components/PhoneFrame.jsx'
 import HelperBanner from '../components/HelperBanner.jsx'
 
@@ -71,19 +71,37 @@ export default function OrderTracking() {
   const accent = accentMap[flow.accent]
 
   const [stage, setStage] = useState(type === 'dine-in' ? 1 : 2)
+  const [position, setPosition] = useState(3)
+  const [lastTick, setLastTick] = useState(Date.now())
+  const [now, setNow] = useState(Date.now())
 
   /* subtle auto-progression so the demo feels alive */
   useEffect(() => {
     setStage(type === 'dine-in' ? 1 : 2)
+    setPosition(3)
+    setLastTick(Date.now())
     const id = setInterval(() => {
       setStage(s => (s >= flow.stages.length - 1 ? (type === 'dine-in' ? 1 : 2) : s + 1))
+      if (type === 'dine-in') {
+        setPosition(p => (p <= 0 ? 3 : p - 1))
+        setLastTick(Date.now())
+      }
     }, 3000)
     return () => clearInterval(id)
   }, [type])
 
+  useEffect(() => {
+    if (type !== 'dine-in') return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [type])
+
+  const liveWait        = Math.max(0, position * 3)
+  const secondsSinceTick = Math.max(0, Math.floor((now - lastTick) / 1000))
+
   return (
     <div className="flex flex-col-reverse gap-8 md:grid md:grid-cols-[1fr_auto] md:items-start">
-      <div className="max-w-md">
+      <div className="hidden max-w-md md:block">
         <h1 className="text-xl font-semibold text-slate-900">Order tracking</h1>
         <p className="mt-1.5 text-sm text-slate-500">
           The tracker switches based on what the customer chose. A <span className="font-medium text-slate-900">dine-in token</span> is
@@ -146,9 +164,39 @@ export default function OrderTracking() {
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <Stat icon={flow.headerLeft.label.includes('position') ? Users : Clock} label={flow.headerLeft.label} value={flow.headerLeft.value} />
-          <Stat icon={Clock} label={flow.headerRight.label} value={flow.headerRight.value} />
+          {type === 'dine-in' ? (
+            <>
+              <Stat
+                icon={Users}
+                label="Queue position"
+                value={position === 0 ? "It's your turn!" : `#${position}`}
+                live
+              />
+              <Stat
+                icon={Clock}
+                label="Estimated wait"
+                value={position === 0 ? 'Now' : `~ ${liveWait} min`}
+                live
+              />
+            </>
+          ) : (
+            <>
+              <Stat icon={flow.headerLeft.label.includes('position') ? Users : Clock} label={flow.headerLeft.label} value={flow.headerLeft.value} />
+              <Stat icon={Clock} label={flow.headerRight.label} value={flow.headerRight.value} />
+            </>
+          )}
         </div>
+
+        {type === 'dine-in' && (
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            <Radio className="h-3 w-3 text-emerald-500" />
+            Live · updated {secondsSinceTick === 0 ? 'just now' : `${secondsSinceTick}s ago`}
+          </div>
+        )}
 
         <ol className="mt-4 space-y-3">
           {flow.stages.map((s, i) => {
@@ -196,14 +244,26 @@ export default function OrderTracking() {
   )
 }
 
-function Stat({ icon: Icon, label, value }) {
+function Stat({ icon: Icon, label, value, live }) {
   return (
     <div className="rounded-lg bg-white p-2.5 ring-1 ring-slate-200">
       <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
         <Icon className="h-3.5 w-3.5" />
         {label}
       </div>
-      <div className="mt-0.5 text-sm font-semibold text-slate-900">{value}</div>
+      {live ? (
+        <motion.div
+          key={value}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="mt-0.5 text-sm font-semibold text-slate-900"
+        >
+          {value}
+        </motion.div>
+      ) : (
+        <div className="mt-0.5 text-sm font-semibold text-slate-900">{value}</div>
+      )}
     </div>
   )
 }

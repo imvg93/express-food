@@ -6,5 +6,18 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true
+  },
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react:    ['react', 'react-dom', 'react-router-dom'],
+          motion:   ['framer-motion'],
+          charts:   ['recharts'],
+          icons:    ['lucide-react']
+        }
+      }
+    }
   }
 })

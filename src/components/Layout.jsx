@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   QrCode, Ticket, Truck, ShoppingBag, CreditCard, MapPin,
   LayoutDashboard, ChefHat, Users, ClipboardList, Tv, Utensils,
-  TrendingUp, MessageCircle, Menu, X
+  TrendingUp, MessageCircle, Menu, X, Search
 } from 'lucide-react'
 
 const groups = [
@@ -16,7 +16,8 @@ const groups = [
       { to: '/express',  icon: Truck,       label: 'Express Food' },
       { to: '/parcel',   icon: ShoppingBag, label: 'Parcel Order' },
       { to: '/payment',  icon: CreditCard,  label: 'Payment Status' },
-      { to: '/tracking', icon: MapPin,      label: 'Order Tracking' }
+      { to: '/tracking', icon: MapPin,      label: 'Order Tracking' },
+      { to: '/check',    icon: Search,      label: 'Check My Order' }
     ]
   },
   {
@@ -41,21 +42,18 @@ const groups = [
 export default function Layout() {
   const location = useLocation()
   const [navOpen, setNavOpen] = useState(false)
+  const fullBleed = location.pathname === '/display' || location.pathname === '/highway'
 
-  /* close mobile drawer on route change */
   useEffect(() => { setNavOpen(false) }, [location.pathname])
 
-  /* lock body scroll while drawer is open */
   useEffect(() => {
     document.body.style.overflow = navOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [navOpen])
 
-  const fullBleed = location.pathname === '/display' || location.pathname === '/highway'
-
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="hidden w-64 flex-shrink-0 border-r border-slate-200 bg-white md:flex md:flex-col">
+      <aside className="sticky top-0 hidden h-screen w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
         <Brand />
         <NavList />
         <div className="border-t border-slate-200 px-5 py-3 text-[11px] text-slate-400">
@@ -79,13 +77,13 @@ export default function Layout() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.24 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-[80%] max-w-[280px] flex-col border-r border-slate-200 bg-white md:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-[82%] max-w-[300px] flex-col border-r border-slate-200 bg-white md:hidden"
             >
               <div className="flex items-center justify-between pr-2">
                 <Brand />
                 <button
                   onClick={() => setNavOpen(false)}
-                  className="mr-2 flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+                  className="mr-2 flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />
@@ -98,10 +96,10 @@ export default function Layout() {
       </AnimatePresence>
 
       <main className="min-w-0 flex-1">
-        <div className="sticky top-0 z-30 flex items-center gap-2 border-b border-slate-200 bg-white/90 px-3 py-2.5 backdrop-blur md:px-8 md:py-3">
+        <div className="sticky top-0 z-30 flex items-center gap-2 border-b border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:px-8 md:py-3">
           <button
             onClick={() => setNavOpen(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
@@ -114,18 +112,15 @@ export default function Layout() {
           </div>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.22 }}
-            className={fullBleed ? '' : 'p-4 sm:p-6 md:p-8'}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22 }}
+          className={fullBleed ? '' : 'p-3 sm:p-6 md:p-8'}
+        >
+          <Outlet />
+        </motion.div>
       </main>
     </div>
   )

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ShoppingBag, ArrowRight, ArrowLeft, Leaf, Drumstick,
-  CreditCard, Wallet, Smartphone, CheckCircle2
+  CreditCard, Wallet, Smartphone, CheckCircle2,
+  User, Phone, MessageCircle
 } from 'lucide-react'
 import PhoneFrame from '../components/PhoneFrame.jsx'
 import HelperBanner from '../components/HelperBanner.jsx'
@@ -19,10 +20,19 @@ const payMethods  = [
 ]
 
 export default function ParcelOrder() {
-  const [step, setStep]       = useState(1) // 1 = menu, 2 = payment, 3 = done
+  const [step, setStep]       = useState(0) // 0 = contact, 1 = menu, 2 = payment, 3 = done
+  const [name, setName]       = useState('')
+  const [mobile, setMobile]   = useState('')
+  const [whatsappDifferent, setWhatsappDifferent] = useState(false)
+  const [whatsapp, setWhatsapp] = useState('')
   const [qty, setQty]         = useState({})
   const [pickup, setPickup]   = useState('30 min')
   const [pay, setPay]         = useState('upi')
+
+  const nameValid   = name.trim().length >= 2
+  const phoneValid  = /^\d{10}$/.test(mobile)
+  const waValid     = !whatsappDifferent || /^\d{10}$/.test(whatsapp)
+  const canContinue = nameValid && phoneValid && waValid
 
   const setItemQty = (id, n) => setQty(q => ({ ...q, [id]: Math.max(0, n) }))
 
@@ -38,7 +48,7 @@ export default function ParcelOrder() {
 
   return (
     <div className="flex flex-col-reverse gap-8 md:grid md:grid-cols-[1fr_auto] md:items-start">
-      <div className="max-w-md">
+      <div className="hidden max-w-md md:block">
         <h1 className="text-xl font-semibold text-slate-900">Parcel order</h1>
         <p className="mt-1.5 text-sm text-slate-500">
           Customer picks items, chooses a pickup time and pays — kitchen starts cooking
@@ -61,6 +71,7 @@ export default function ParcelOrder() {
           <div>
             <div className="text-sm font-semibold text-slate-900">Parcel Order</div>
             <div className="text-[11px] text-slate-500">
+              {step === 0 && 'Tell us who you are'}
               {step === 1 && 'Choose items & pickup time'}
               {step === 2 && 'Choose payment'}
               {step === 3 && 'Order confirmed'}
@@ -70,7 +81,7 @@ export default function ParcelOrder() {
 
         {/* tiny step indicator */}
         <div className="mt-3 flex items-center justify-center gap-1.5">
-          {[1, 2, 3].map(n => (
+          {[0, 1, 2, 3].map(n => (
             <span
               key={n}
               className={`h-1.5 rounded-full transition-all ${
@@ -81,6 +92,83 @@ export default function ParcelOrder() {
         </div>
 
         <AnimatePresence mode="wait">
+          {step === 0 && (
+            <motion.div
+              key="contact"
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.2 }}
+              className="mt-4 space-y-3"
+            >
+              <ContactField label="Your name" icon={User}>
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+                />
+              </ContactField>
+
+              <ContactField label="Mobile number" icon={Phone}>
+                <input
+                  value={mobile}
+                  onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  placeholder="10-digit mobile"
+                  inputMode="numeric"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+                />
+              </ContactField>
+
+              <div className="rounded-lg bg-white px-3 py-2.5 ring-1 ring-slate-200">
+                <label className="flex cursor-pointer items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm text-slate-700">
+                    <MessageCircle className="h-4 w-4 text-emerald-500" />
+                    WhatsApp number is different
+                  </span>
+                  <Toggle
+                    checked={whatsappDifferent}
+                    onChange={() => setWhatsappDifferent(v => !v)}
+                  />
+                </label>
+
+                {whatsappDifferent && (
+                  <div className="mt-2.5 flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 ring-1 ring-inset ring-slate-200">
+                    <MessageCircle className="h-4 w-4 text-emerald-500" />
+                    <input
+                      value={whatsapp}
+                      onChange={e => setWhatsapp(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="WhatsApp number"
+                      inputMode="numeric"
+                      className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+                    />
+                  </div>
+                )}
+
+                <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+                  We'll send pickup updates to WhatsApp.
+                </p>
+              </div>
+
+              <button
+                onClick={() => canContinue && setStep(1)}
+                disabled={!canContinue}
+                className={`flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                  canContinue
+                    ? 'bg-violet-600 text-white shadow-soft hover:bg-violet-700'
+                    : 'cursor-not-allowed bg-slate-100 text-slate-400'
+                }`}
+              >
+                Continue to menu <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <HelperBanner>
+                Parcel orders need your number so we can confirm and notify you when
+                the food is ready for pickup.
+              </HelperBanner>
+            </motion.div>
+          )}
+
           {step === 1 && (
             <motion.div
               key="menu"
@@ -90,6 +178,20 @@ export default function ParcelOrder() {
               transition={{ duration: 0.2 }}
               className="mt-4"
             >
+              <div className="mb-3 flex items-center justify-between text-xs">
+                <button
+                  onClick={() => setStep(0)}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" /> Edit details
+                </button>
+                <div className="min-w-0 truncate text-right text-slate-500">
+                  <span className="font-medium text-slate-700">{name.trim()}</span>
+                  <span className="mx-1.5 text-slate-300">·</span>
+                  +91 {mobile.replace(/(\d{5})(\d{5})/, '$1 $2')}
+                </div>
+              </div>
+
               <div className="space-y-2">
                 {menu.map((m, i) => (
                   <motion.div
@@ -281,6 +383,14 @@ export default function ParcelOrder() {
                   the counter when you arrive to collect.
                 </HelperBanner>
               </div>
+
+              <div className="mt-2 flex items-start gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-left text-[11px] text-emerald-800 ring-1 ring-emerald-100">
+                <svg className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.66 14.99L2 22l5.16-1.34A10 10 0 1012 2z"/></svg>
+                <span>
+                  A tracking link has been sent to your WhatsApp ({mobile ? `+91 ${mobile.replace(/(\d{5})(\d{5})/, '$1 $2')}` : 'your number'}) —
+                  tap it any time to check pickup status. No login needed.
+                </span>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -311,5 +421,37 @@ function Row({ label, children, border = false }) {
       <span className="text-xs text-slate-500">{label}</span>
       <span>{children}</span>
     </div>
+  )
+}
+
+function ContactField({ label, icon: Icon, children }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
+      <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
+        {Icon && <Icon className="h-4 w-4 text-slate-400" />}
+        {children}
+      </div>
+    </label>
+  )
+}
+
+function Toggle({ checked, onChange }) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      className={`relative h-5 w-9 flex-shrink-0 rounded-full transition ${
+        checked ? 'bg-violet-600' : 'bg-slate-300'
+      }`}
+      aria-pressed={checked}
+    >
+      <motion.span
+        layout
+        className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow"
+        style={{ left: checked ? '20px' : '2px' }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      />
+    </button>
   )
 }
