@@ -18,3 +18,7 @@ npm-debug.log*
 
 # claude session metadata
 .claude/
+
+# local screenshot / verify scratch
+.verify/
+Screenshot*.png

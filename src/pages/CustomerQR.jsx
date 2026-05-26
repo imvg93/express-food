@@ -1,198 +1,240 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { Ticket, Clock, Phone, MessageCircle, ArrowRight, User, Search } from 'lucide-react'
-import PhoneFrame from '../components/PhoneFrame.jsx'
-import HelperBanner from '../components/HelperBanner.jsx'
-import { restaurant } from '../data/sampleData.js'
+import { Link } from 'react-router-dom'
+import {
+  Ticket, Truck, ShoppingBag, ArrowRight, Star, Clock, Users,
+  ShieldCheck, Lock, Sparkles, Headphones, Utensils, Search,
+  ChevronRight, BadgePercent, Leaf, Drumstick, Plus
+} from 'lucide-react'
+import { restaurant, menu, customerLanding, trustBadges } from '../data/sampleData.js'
+
+const trustIcons = { ShieldCheck, Lock, Sparkles, Headphones }
+
+function Hero() {
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-card">
+      <div className="p-6 md:p-7">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
+              <Utensils className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Welcome to</div>
+              <div className="truncate text-xl font-bold tracking-tight text-slate-900">{restaurant.name}</div>
+              <div className="truncate text-xs text-slate-500">{restaurant.tagline}</div>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-slate-700">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inset-0 animate-ping rounded-full bg-slate-300 opacity-75" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-slate-900" />
+            </span>
+            Open
+          </span>
+        </div>
+
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className="rounded-xl border border-slate-200 bg-stone-50/60 p-2.5">
+            <div className="flex items-center gap-1 text-slate-900">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <span className="text-sm font-bold">{customerLanding.rating}</span>
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-500">{customerLanding.reviewsCount} reviews</div>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-stone-50/60 p-2.5">
+            <div className="flex items-center gap-1 text-slate-900">
+              <Clock className="h-3.5 w-3.5 text-slate-700" />
+              <span className="text-sm font-bold">~{restaurant.estimatedWait}m</span>
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-500">Avg wait now</div>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-stone-50/60 p-2.5">
+            <div className="flex items-center gap-1 text-slate-900">
+              <Users className="h-3.5 w-3.5 text-slate-700" />
+              <span className="text-sm font-bold">{customerLanding.liveCovers}</span>
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-500">Dining now</div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-stone-50/60 px-3 py-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-700 ring-1 ring-slate-200">
+            <BadgePercent className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-slate-900">{customerLanding.promo.title}</div>
+            <div className="truncate text-[11px] text-slate-500">{customerLanding.promo.sub}</div>
+          </div>
+          <span className="rounded-md bg-slate-900 px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-white">
+            {customerLanding.promo.code}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ActionCards() {
+  const actions = [
+    { to: '/token',   icon: Ticket,      title: 'Get a Table',       sub: 'Join the live dine-in queue — no waiting in line', eta: '~ 8 min',  etaLabel: 'Next available', tag: 'Dine-in' },
+    { to: '/express', icon: Truck,       title: 'Express Food',       sub: 'Pre-order while you drive — fresh on arrival',     eta: '0 min',     etaLabel: 'Zero wait',       tag: 'Highway' },
+    { to: '/parcel',  icon: ShoppingBag, title: 'Parcel / Takeaway',  sub: 'Order, pay, walk in & collect — kitchen-priority', eta: '~ 14 min',  etaLabel: 'Ready in',        tag: 'Pickup' }
+  ]
+  return (
+    <div className="grid gap-3 md:grid-cols-3">
+      {actions.map(a => (
+        <Link
+          key={a.to}
+          to={a.to}
+          className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lift"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
+              <a.icon className="h-5 w-5" />
+            </div>
+            <span className="rounded-md border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {a.tag}
+            </span>
+          </div>
+
+          <div className="mt-4">
+            <div className="text-base font-bold tracking-tight text-slate-900">{a.title}</div>
+            <p className="mt-1 text-[13px] leading-relaxed text-slate-500">{a.sub}</p>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-slate-500">{a.etaLabel}</div>
+              <div className="text-sm font-bold text-slate-900">{a.eta}</div>
+            </div>
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition group-hover:bg-slate-800">
+              <ArrowRight className="h-4 w-4" />
+            </span>
+          </div>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
+function PopularDishes() {
+  const popular = menu.filter(m => m.popular)
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <div className="flex items-end justify-between">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Today's picks</div>
+          <div className="mt-0.5 text-sm font-bold tracking-tight text-slate-900">Most loved</div>
+        </div>
+        <Link to="/parcel" className="inline-flex items-center gap-0.5 text-xs font-semibold text-slate-700 hover:text-slate-900">
+          See full menu <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+
+      <div className="mt-4 -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:grid md:grid-cols-3 md:gap-3 md:overflow-visible">
+        {popular.map(d => <DishCard key={d.id} dish={d} />)}
+      </div>
+    </div>
+  )
+}
+
+function DishCard({ dish }) {
+  return (
+    <div className="group relative flex w-[230px] flex-shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-soft md:w-auto">
+      <div className="relative flex h-32 items-center justify-center bg-stone-50">
+        <span className="text-6xl grayscale-0">{dish.emoji}</span>
+        {dish.tag && (
+          <span className="absolute left-2 top-2 inline-flex items-center rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
+            {dish.tag}
+          </span>
+        )}
+        <span className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-slate-200 bg-white">
+          {dish.veg
+            ? <Leaf className="h-3.5 w-3.5 text-emerald-600" />
+            : <Drumstick className="h-3.5 w-3.5 text-rose-600" />}
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col p-3">
+        <div className="truncate text-sm font-bold text-slate-900">{dish.name}</div>
+        <div className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500">{dish.description}</div>
+
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-600">
+          <span className="inline-flex items-center gap-0.5 font-semibold text-slate-800">
+            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+            {dish.rating}
+          </span>
+          <span className="text-slate-300">·</span>
+          <span className="inline-flex items-center gap-0.5">
+            <Clock className="h-3 w-3" /> {dish.prepTime} min
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5">
+          <span className="text-base font-bold text-slate-900">₹{dish.price}</span>
+          <button
+            className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-slate-800"
+            onClick={(e) => e.preventDefault()}
+            aria-label={`Add ${dish.name}`}
+          >
+            <Plus className="h-3.5 w-3.5" /> Add
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TrustStrip() {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+      <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+        {trustBadges.map(t => {
+          const Icon = trustIcons[t.icon] || ShieldCheck
+          return (
+            <div key={t.label} className="flex items-center gap-2 rounded-lg border border-slate-100 bg-stone-50/60 px-3 py-2">
+              <Icon className="h-4 w-4 flex-shrink-0 text-slate-700" />
+              <span className="text-[12px] font-medium text-slate-700">{t.label}</span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function AlreadyOrderedCTA() {
+  return (
+    <Link
+      to="/check"
+      className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-card transition hover:border-slate-300 hover:bg-stone-50/30"
+    >
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-stone-50 text-slate-700">
+          <Search className="h-4 w-4" />
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-slate-900">Already ordered?</div>
+          <div className="text-[11px] text-slate-500">Check your live order status or token</div>
+        </div>
+      </div>
+      <ArrowRight className="h-4 w-4 text-slate-400" />
+    </Link>
+  )
+}
 
 export default function CustomerQR() {
-  const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [mobile, setMobile] = useState('')
-  const [whatsappDifferent, setWhatsappDifferent] = useState(false)
-  const [whatsapp, setWhatsapp] = useState('')
-
-  const nameValid  = name.trim().length >= 2
-  const phoneValid = /^\d{10}$/.test(mobile)
-  const waValid    = !whatsappDifferent || /^\d{10}$/.test(whatsapp)
-  const canContinue = nameValid && phoneValid && waValid
-
-  const handleContinue = () => {
-    if (!canContinue) return
-    navigate('/token')
-  }
-
   return (
-    <div className="flex flex-col-reverse gap-8 md:grid md:grid-cols-[1fr_auto] md:items-start">
-      <div className="hidden max-w-md md:block">
-        <h1 className="text-xl font-semibold text-slate-900">After QR scan</h1>
-        <p className="mt-1.5 text-sm text-slate-500">
-          This is what the customer sees when they scan the table or signboard QR.
-          Name and mobile are captured, then the customer joins the live dine-in queue
-          straight away. Express Food and Parcel each have their own separate QR / flow.
-        </p>
+    <div className="mx-auto max-w-3xl space-y-4 md:space-y-5">
+      <Hero />
+      <ActionCards />
+      <PopularDishes />
+      <TrustStrip />
+      <AlreadyOrderedCTA />
 
-        <div className="mt-5 space-y-3 text-sm text-slate-600">
-          <Step n={1} active done={false}>
-            Enter name and mobile number. If WhatsApp is different, capture that too —
-            order updates are sent there.
-          </Step>
-          <Step n={2} active={false} done={false}>
-            Token is generated and added to the live dine-in queue instantly.
-          </Step>
-          <Step n={3} active={false} done={false}>
-            Kitchen and counter staff see the new token in real time.
-          </Step>
-        </div>
+      <div className="flex items-center justify-center gap-1.5 pt-2 text-[11px] text-slate-400">
+        <Utensils className="h-3.5 w-3.5" />
+        <span>Powered by Smart Queue Control</span>
       </div>
-
-      <PhoneFrame title="Customer view">
-        <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white shadow-soft">
-            <Ticket className="h-5 w-5" />
-          </div>
-          <h2 className="mt-3 text-base font-semibold text-slate-900">{restaurant.name}</h2>
-          <p className="text-xs text-slate-500">{restaurant.tagline}</p>
-
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs text-slate-600 ring-1 ring-slate-200">
-            <Clock className="h-3.5 w-3.5 text-amber-500" />
-            Estimated wait · {restaurant.estimatedWait} min
-          </div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className="mt-4 space-y-3"
-        >
-          <p className="text-center text-sm text-slate-600">
-            Welcome! Enter your details to join the dine-in queue.
-          </p>
-
-          <Field label="Your name" icon={User}>
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="e.g. Rahul Sharma"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
-            />
-          </Field>
-
-          <Field label="Mobile number" icon={Phone}>
-            <input
-              value={mobile}
-              onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-              placeholder="10-digit mobile"
-              inputMode="numeric"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
-            />
-          </Field>
-
-          <div className="rounded-lg bg-white px-3 py-2.5 ring-1 ring-slate-200">
-            <label className="flex cursor-pointer items-center justify-between">
-              <span className="flex items-center gap-2 text-sm text-slate-700">
-                <MessageCircle className="h-4 w-4 text-emerald-500" />
-                WhatsApp number is different
-              </span>
-              <Toggle
-                checked={whatsappDifferent}
-                onChange={() => setWhatsappDifferent(v => !v)}
-              />
-            </label>
-
-            {whatsappDifferent && (
-              <div className="mt-2.5 flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 ring-1 ring-inset ring-slate-200">
-                <MessageCircle className="h-4 w-4 text-emerald-500" />
-                <input
-                  value={whatsapp}
-                  onChange={e => setWhatsapp(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="WhatsApp number"
-                  inputMode="numeric"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
-                />
-              </div>
-            )}
-
-            <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-              We'll send token and order updates to your WhatsApp.
-            </p>
-          </div>
-
-          <button
-            onClick={handleContinue}
-            disabled={!canContinue}
-            className={`flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-              canContinue
-                ? 'bg-brand-600 text-white shadow-soft hover:bg-brand-700'
-                : 'cursor-not-allowed bg-slate-100 text-slate-400'
-            }`}
-          >
-            Join the queue <ArrowRight className="h-4 w-4" />
-          </button>
-
-          <HelperBanner>
-            Scanning the table QR puts you straight into the dine-in queue.
-            Express Food and Parcel orders use their own separate QR codes.
-          </HelperBanner>
-
-          <Link
-            to="/check"
-            className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-2.5 text-xs font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
-          >
-            <Search className="h-3.5 w-3.5" />
-            Already ordered? Check my status
-          </Link>
-        </motion.div>
-      </PhoneFrame>
     </div>
-  )
-}
-
-function Step({ n, active, done, children }) {
-  return (
-    <div className="flex gap-3">
-      <span className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium ${
-        done
-          ? 'bg-emerald-100 text-emerald-700'
-          : active
-            ? 'bg-brand-600 text-white'
-            : 'bg-slate-100 text-slate-500'
-      }`}>{n}</span>
-      <p>{children}</p>
-    </div>
-  )
-}
-
-function Field({ label, icon: Icon, children }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
-      <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100">
-        {Icon && <Icon className="h-4 w-4 text-slate-400" />}
-        {children}
-      </div>
-    </label>
-  )
-}
-
-function Toggle({ checked, onChange }) {
-  return (
-    <button
-      type="button"
-      onClick={onChange}
-      className={`relative h-5 w-9 flex-shrink-0 rounded-full transition ${
-        checked ? 'bg-brand-600' : 'bg-slate-300'
-      }`}
-      aria-pressed={checked}
-    >
-      <motion.span
-        layout
-        className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow"
-        style={{ left: checked ? '20px' : '2px' }}
-        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-      />
-    </button>
   )
 }

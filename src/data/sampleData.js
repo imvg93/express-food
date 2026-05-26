@@ -5,14 +5,47 @@ export const restaurant = {
 }
 
 export const menu = [
-  { id: 1, name: 'Butter Chicken',        price: 320, veg: false, popular: true  },
-  { id: 2, name: 'Paneer Butter Masala',  price: 280, veg: true,  popular: true  },
-  { id: 3, name: 'Veg Biryani',           price: 220, veg: true,  popular: false },
-  { id: 4, name: 'Chicken Biryani',       price: 280, veg: false, popular: true  },
-  { id: 5, name: 'Tandoori Roti',         price:  25, veg: true,  popular: false },
-  { id: 6, name: 'Butter Naan',           price:  45, veg: true,  popular: false },
-  { id: 7, name: 'Masala Dosa',           price: 140, veg: true,  popular: true  },
-  { id: 8, name: 'Filter Coffee',         price:  60, veg: true,  popular: false }
+  { id: 1, name: 'Butter Chicken',        price: 320, veg: false, popular: true,  category: 'mains',     emoji: '🍗', gradient: ['#fbbf24', '#f43f5e'], rating: 4.7, reviews: 286, prepTime: 18, tag: "Chef's special", description: 'Slow-cooked tomato gravy, butter, mild kashmiri chilli' },
+  { id: 2, name: 'Paneer Butter Masala',  price: 280, veg: true,  popular: true,  category: 'mains',     emoji: '🧀', gradient: ['#fdba74', '#ef4444'], rating: 4.6, reviews: 312, prepTime: 14, tag: 'Bestseller',      description: 'Cottage cheese in a rich cashew-tomato gravy' },
+  { id: 3, name: 'Veg Biryani',           price: 220, veg: true,  popular: false, category: 'biryani',   emoji: '🍚', gradient: ['#fde047', '#f59e0b'], rating: 4.4, reviews: 198, prepTime: 22, tag: null,              description: 'Long-grain basmati, saffron, mint, fried onions' },
+  { id: 4, name: 'Chicken Biryani',       price: 280, veg: false, popular: true,  category: 'biryani',   emoji: '🍛', gradient: ['#f59e0b', '#c2410c'], rating: 4.8, reviews: 421, prepTime: 25, tag: 'Most loved',      description: 'Dum-cooked basmati with bone-in chicken, raita & salan' },
+  { id: 5, name: 'Tandoori Roti',         price:  25, veg: true,  popular: false, category: 'breads',    emoji: '🫓', gradient: ['#fde68a', '#fbbf24'], rating: 4.3, reviews:  92, prepTime:  6, tag: null,              description: 'Fresh from the tandoor, charred edges' },
+  { id: 6, name: 'Butter Naan',           price:  45, veg: true,  popular: false, category: 'breads',    emoji: '🍞', gradient: ['#fef3c7', '#facc15'], rating: 4.5, reviews: 140, prepTime:  6, tag: null,              description: 'Soft naan brushed with white butter' },
+  { id: 7, name: 'Masala Dosa',           price: 140, veg: true,  popular: true,  category: 'breakfast', emoji: '🥞', gradient: ['#fde047', '#f97316'], rating: 4.6, reviews: 274, prepTime: 10, tag: 'Breakfast pick',  description: 'Crispy dosa, spiced potato filling, coconut chutney' },
+  { id: 8, name: 'Filter Coffee',         price:  60, veg: true,  popular: false, category: 'drinks',    emoji: '☕', gradient: ['#a16207', '#292524'], rating: 4.7, reviews: 156, prepTime:  4, tag: null,              description: 'South Indian filter decoction with hot milk' },
+  { id: 9, name: 'Gulab Jamun (2 pc)',    price:  80, veg: true,  popular: false, category: 'desserts',  emoji: '🍮', gradient: ['#f59e0b', '#92400e'], rating: 4.6, reviews: 168, prepTime:  3, tag: 'Sweet finish',    description: 'Warm milk dumplings in rose-cardamom syrup' },
+  { id:10, name: 'Mango Lassi',           price:  90, veg: true,  popular: false, category: 'drinks',    emoji: '🥭', gradient: ['#fde047', '#f59e0b'], rating: 4.5, reviews: 134, prepTime:  3, tag: null,              description: 'Thick yogurt smoothie with Alphonso mango pulp' }
+]
+
+export const menuCategories = [
+  { key: 'all',       label: 'All',       emoji: '🍽️' },
+  { key: 'mains',     label: 'Mains',     emoji: '🍗' },
+  { key: 'biryani',   label: 'Biryani',   emoji: '🍚' },
+  { key: 'breads',    label: 'Breads',    emoji: '🫓' },
+  { key: 'breakfast', label: 'Breakfast', emoji: '🥞' },
+  { key: 'desserts',  label: 'Desserts',  emoji: '🍮' },
+  { key: 'drinks',    label: 'Drinks',    emoji: '☕' }
+]
+
+export const customerLanding = {
+  rating:        4.7,
+  reviewsCount:  '2.4k',
+  hygieneRating: 5,
+  todayOpen:     '7:00 AM – 11:30 PM',
+  ordersToday:   87,
+  liveCovers:    14,
+  promo: {
+    title: 'Weekend combo',
+    sub:   'Biryani + Lassi @ ₹299',
+    code:  'WKND299'
+  }
+}
+
+export const trustBadges = [
+  { icon: 'ShieldCheck', label: 'FSSAI · 5★ hygiene' },
+  { icon: 'Lock',        label: '100% secure payment' },
+  { icon: 'Sparkles',    label: 'Fresh daily prep' },
+  { icon: 'Headphones',  label: 'Live order tracking' }
 ]
 
 export const liveQueue = [
@@ -58,6 +91,134 @@ export const dashboardStats = {
   avgWaitMinutes: 11,
   activeQueue: 14
 }
+
+/* alert strip across the top of the owner dashboard.
+   Restaurant-flavored: kitchen + payments + customer ops, not CRM. */
+export const dashboardAlerts = [
+  {
+    id: 'wallet',
+    tone: 'amber',
+    title: 'WhatsApp credits: 4,280 left',
+    sub: 'Used for order-ready pings and re-engagement. Recharge before the weekend rush.'
+  },
+  {
+    id: 'pending',
+    tone: 'amber',
+    title: 'Pending payments: ₹4,640',
+    sub: '8 dine-in tokens still unpaid. Tap to remind from the Staff screen.'
+  },
+  {
+    id: 'lowstock',
+    tone: 'amber',
+    title: 'Butter Chicken running low',
+    sub: '~6 portions remaining at current pace. Flag to kitchen to prep next batch.'
+  }
+]
+
+/* eight headline restaurant KPIs.
+   base = numeric value; format tells the renderer how to display it after scaling. */
+export const dashboardKpis = [
+  { key: 'revenue',   label: "Today's revenue", base: 47400, format: 'inr',  delta: 12.4, sub: 'Target ₹42,000',   spark: [22, 24, 26, 28, 31, 33, 36, 38, 40, 42, 45, 47] },
+  { key: 'orders',    label: 'Total orders',     base:    87, format: 'n',    delta: 8.1,  sub: '92 tokens issued',  spark: [42, 48, 53, 56, 60, 64, 68, 72, 76, 80, 84, 87] },
+  { key: 'tokens',    label: 'Active tokens',    base:    14, format: 'n',    delta: 4.2,  sub: 'in live queue',     spark: [9, 10, 12, 13, 11, 12, 13, 14, 15, 14, 14, 14]  },
+  { key: 'wait',      label: 'Avg waiting time', base:    11, format: 'min',  delta: -6.4, sub: 'down from 13 min',  spark: [16, 15, 15, 14, 14, 13, 13, 12, 12, 11, 11, 11] },
+  { key: 'express',   label: 'Express orders',   base:    24, format: 'n',    delta: 18.6, sub: '312 highway scans', spark: [6, 8, 10, 11, 13, 14, 16, 18, 19, 21, 22, 24]   },
+  { key: 'parcel',    label: 'Parcel orders',    base:    18, format: 'n',    delta: 3.2,  sub: '4 pickup pending',  spark: [4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16, 18]      },
+  { key: 'pending',   label: 'Pending payments', base:  4640, format: 'inr',  delta: -5.8, sub: '8 unpaid tokens',   spark: [82, 80, 78, 76, 74, 75, 73, 72, 71, 70, 69, 65] },
+  { key: 'completed', label: 'Completed orders', base:    62, format: 'n',    delta: 9.7,  sub: 'served & cleared',  spark: [28, 32, 36, 40, 44, 48, 50, 53, 56, 58, 60, 62] }
+]
+
+export const liveQueueStatus = {
+  currentToken:     'T-1047',
+  nextToken:        'T-1048',
+  waitingCustomers: 9,
+  seatedCustomers:  14,
+  completedTokens:  78,
+  avgWaitMinutes:   11
+}
+
+export const kitchenStatus = {
+  new:        4,
+  preparing:  7,
+  ready:      3,
+  delayed:    1,
+  completed: 62
+}
+
+export const liveOrderFlow = [
+  { id: 'ORD-2041', type: 'QR Order',     customer: 'Rahul Sharma',  amount: 560, payment: 'Paid',    status: 'Preparing' },
+  { id: 'ORD-2042', type: 'Express Food', customer: 'Vikram Singh',  amount: 320, payment: 'Paid',    status: 'Ready'     },
+  { id: 'ORD-2043', type: 'Parcel',       customer: 'Karan Patel',   amount: 460, payment: 'Pending', status: 'New'       },
+  { id: 'ORD-2044', type: 'Counter Bill', customer: 'Walk-in #18',   amount: 240, payment: 'Paid',    status: 'Served'    },
+  { id: 'ORD-2045', type: 'QR Order',     customer: 'Aarti Mehta',   amount: 980, payment: 'Paid',    status: 'Accepted'  },
+  { id: 'ORD-2046', type: 'Express Food', customer: 'Sneha Reddy',   amount: 280, payment: 'Paid',    status: 'Preparing' },
+  { id: 'ORD-2047', type: 'Parcel',       customer: 'Meera Pillai',  amount: 640, payment: 'Paid',    status: 'Ready'     },
+  { id: 'ORD-2048', type: 'Counter Bill', customer: 'Walk-in #19',   amount: 380, payment: 'Failed',  status: 'New'       }
+]
+
+export const revenueBreakdown = [
+  { source: 'QR orders',      value: 22400, color: '#2563eb' },
+  { source: 'Express orders', value: 11200, color: '#16a34a' },
+  { source: 'Parcel orders',  value:  8400, color: '#0ea5a4' },
+  { source: 'Counter billing',value:  5400, color: '#d97706' }
+]
+
+export const paymentCollection = [
+  { mode: 'UPI',      amount: 21800, txns: 42, color: '#7c3aed' },
+  { mode: 'Cash',     amount: 12400, txns: 19, color: '#0f766e' },
+  { mode: 'Card',     amount:  8200, txns: 11, color: '#2563eb' },
+  { mode: 'Online',   amount:  3400, txns:  6, color: '#0ea5a4' },
+  { mode: 'Pending',  amount:  4640, txns:  8, color: '#d97706' },
+  { mode: 'Failed',   amount:   320, txns:  1, color: '#dc2626' },
+  { mode: 'Refunds',  amount:   180, txns:  1, color: '#64748b' }
+]
+
+export const peakHourPerformance = [
+  { period: 'Morning', range: '8–11 AM',  orders: 18, revenue:  9800 },
+  { period: 'Lunch',   range: '11–3 PM',  orders: 42, revenue: 22400 },
+  { period: 'Evening', range: '3–7 PM',   orders: 14, revenue:  6800 },
+  { period: 'Night',   range: '7–11 PM',  orders: 13, revenue:  8400 }
+]
+
+export const operationalAlerts = [
+  { id: 1, severity: 'high',   icon: 'AlertOctagon',title: '2 orders delayed > 15 min', sub: 'T-1042, T-1039 — flag kitchen' },
+  { id: 2, severity: 'high',   icon: 'Wallet',      title: 'Pending payments ₹4,640',    sub: '8 dine-in tokens unpaid' },
+  { id: 3, severity: 'medium', icon: 'ChefHat',     title: 'High kitchen load',          sub: '11 active tickets · 1 delayed' },
+  { id: 4, severity: 'medium', icon: 'Clock',       title: 'Long wait at counter',       sub: 'Avg 14 min for last 6 covers' },
+  { id: 5, severity: 'info',   icon: 'Truck',       title: 'Express arrival in 6 min',   sub: 'T-1052 · Sneha Reddy · 2.4 km' },
+  { id: 6, severity: 'info',   icon: 'ShoppingBag', title: 'Parcel P-2031 ready',        sub: 'Pickup pending · 4 min' }
+]
+
+export const quickActions = [
+  { label: 'Call next token',  icon: 'Bell',        tone: 'brand'   },
+  { label: 'Generate bill',    icon: 'Receipt',     tone: 'emerald' },
+  { label: 'Add manual order', icon: 'Plus',        tone: 'slate'   },
+  { label: 'Kitchen orders',   icon: 'ChefHat',     tone: 'amber'   },
+  { label: 'Payment report',   icon: 'Wallet',      tone: 'violet'  },
+  { label: 'Create parcel',    icon: 'ShoppingBag', tone: 'cyan'    },
+  { label: 'Daily report',     icon: 'Download',    tone: 'slate'   }
+]
+
+/* 6-month restaurant revenue trend with a flat target line.
+   Values are in ₹ lakh (the chart formats them as ₹XL). */
+export const monthlyRevenue = [
+  { month: 'Dec', revenue: 9.8,  target: 14 },
+  { month: 'Jan', revenue: 11.2, target: 14 },
+  { month: 'Feb', revenue: 12.6, target: 14 },
+  { month: 'Mar', revenue: 13.4, target: 14 },
+  { month: 'Apr', revenue: 14.8, target: 14 },
+  { month: 'May', revenue: 15.6, target: 14 }
+]
+
+/* order pipeline funnel for the right column of the owner dashboard:
+   token issued → accepted → cooking → ready → handed to customer. */
+export const orderPipeline = [
+  { stage: 'Tokens issued', count: 92, color: '#2f6fff' },
+  { stage: 'Accepted',      count: 87, color: '#b08a3a' },
+  { stage: 'Preparing',     count: 71, color: '#0f766e' },
+  { stage: 'Ready',         count: 64, color: '#15803d' },
+  { stage: 'Served',        count: 58, color: '#166534' }
+]
 
 /* revenue-impact features. numbers shown in /admin "smart features"
    strip and on the highway and re-engagement pages. */

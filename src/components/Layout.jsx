@@ -23,7 +23,7 @@ const groups = [
   {
     label: 'Restaurant operations',
     items: [
-      { to: '/admin',   icon: LayoutDashboard, label: 'Owner Dashboard' },
+      { to: '/admin',   icon: LayoutDashboard, label: 'Control Center' },
       { to: '/kitchen', icon: ChefHat,         label: 'Kitchen Screen' },
       { to: '/staff',   icon: Users,           label: 'Staff Screen' },
       { to: '/orders',  icon: ClipboardList,   label: "Today's Orders" },

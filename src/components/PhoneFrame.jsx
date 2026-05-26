@@ -15,9 +15,9 @@ export default function PhoneFrame({ children, title }) {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="rounded-2xl border border-slate-200 bg-white p-0 shadow-card md:rounded-[28px] md:p-3 md:shadow-lift"
+        className="rounded-2xl border border-slate-200 bg-white p-0 shadow-card md:rounded-[28px] md:p-2 md:shadow-lift"
       >
-        <div className="rounded-2xl bg-slate-50 p-3 sm:p-4 md:rounded-[20px]">
+        <div className="rounded-2xl bg-white p-4 sm:p-5 md:rounded-[22px]">
           {children}
         </div>
       </motion.div>
