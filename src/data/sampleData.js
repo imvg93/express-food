@@ -1,6 +1,6 @@
 export const restaurant = {
-  name: 'Highway Spice Junction',
-  tagline: 'NH-48 · Open 24×7',
+  name: 'Rayudu Gari Military Hotel',
+  tagline: 'Pakka Military · Pakka Fine Dine · NH-48',
   estimatedWait: 12
 }
 
@@ -280,7 +280,7 @@ export const whatsappMessages = [
     template: 'reengagement-14d',
     preview: 'We miss you! Here\'s 15% off your next biryani.',
     body: [
-      { from: 'us', text: 'Hi Anjali, we miss you at Highway Spice Junction 🙏' },
+      { from: 'us', text: 'Hi Anjali, we miss you at Rayudu Gari Military Hotel 🙏' },
       { from: 'us', text: 'Here\'s 15% off your next biryani — valid this week. Use code: WELCOME15' },
       { from: 'them', text: 'Oh nice, I\'ll stop by Saturday!' }
     ]

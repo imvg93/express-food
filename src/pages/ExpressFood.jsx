@@ -6,6 +6,7 @@ import {
   MessageCircle, Minus, Plus, Clock
 } from 'lucide-react'
 import PhoneFrame from '../components/PhoneFrame.jsx'
+import WhatsAppCheck, { useWhatsAppCheck } from '../components/WhatsAppCheck.jsx'
 import { menu } from '../data/sampleData.js'
 
 export default function ExpressFood() {
@@ -21,7 +22,9 @@ export default function ExpressFood() {
   const nameValid  = name.trim().length >= 2
   const phoneValid = /^\d{10}$/.test(mobile)
   const waValid    = !whatsappDifferent || /^\d{10}$/.test(whatsapp)
-  const canContinue = nameValid && phoneValid && waValid
+  const waTarget   = whatsappDifferent ? whatsapp : mobile
+  const waStatus   = useWhatsAppCheck(waTarget)
+  const canContinue = nameValid && phoneValid && waValid && waStatus !== 'checking'
 
   const setItemQty = (id, n) => setQty(q => ({ ...q, [id]: Math.max(0, n) }))
 
@@ -81,9 +84,11 @@ export default function ExpressFood() {
                 />
               </div>
             )}
-            <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-              We'll send order updates to your WhatsApp.
-            </p>
+            <WhatsAppCheck
+              status={waStatus}
+              number={waTarget}
+              idleHint="We'll check this number for WhatsApp and send your order updates there."
+            />
           </div>
 
           <PrimaryButton onClick={() => canContinue && setStep(2)} disabled={!canContinue}>

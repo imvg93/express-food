@@ -3,8 +3,8 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   QrCode, Ticket, Truck, ShoppingBag, CreditCard, MapPin,
-  LayoutDashboard, ChefHat, Users, ClipboardList, Tv, Utensils,
-  TrendingUp, MessageCircle, Menu, X, Search
+  LayoutDashboard, ChefHat, Users, ClipboardList, Tv,
+  TrendingUp, MessageCircle, Menu, X, Search, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react'
 
 const groups = [
@@ -42,6 +42,11 @@ const groups = [
 export default function Layout() {
   const location = useLocation()
   const [navOpen, setNavOpen] = useState(false)
+  // desktop sidebar open/closed — remembered across reloads
+  const [deskOpen, setDeskOpen] = useState(() => {
+    if (typeof window === 'undefined') return true
+    return localStorage.getItem('sidebarOpen') !== 'false'
+  })
   const fullBleed = location.pathname === '/display' || location.pathname === '/highway'
 
   useEffect(() => { setNavOpen(false) }, [location.pathname])
@@ -51,10 +56,26 @@ export default function Layout() {
     return () => { document.body.style.overflow = '' }
   }, [navOpen])
 
+  useEffect(() => {
+    localStorage.setItem('sidebarOpen', String(deskOpen))
+  }, [deskOpen])
+
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="sticky top-0 hidden h-screen w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
-        <Brand />
+      <aside className={`sticky top-0 h-screen w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-white ${
+        deskOpen ? 'hidden md:flex' : 'hidden'
+      }`}>
+        <div className="flex items-center justify-between pr-2">
+          <Brand />
+          <button
+            onClick={() => setDeskOpen(false)}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            aria-label="Collapse sidebar"
+            title="Collapse sidebar"
+          >
+            <PanelLeftClose className="h-5 w-5" />
+          </button>
+        </div>
         <NavList />
         <div className="border-t border-slate-200 px-5 py-3 text-[11px] text-slate-400">
           Demo build · client preview
@@ -105,6 +126,18 @@ export default function Layout() {
             <Menu className="h-5 w-5" />
           </button>
 
+          {/* desktop: reopen the collapsed sidebar */}
+          {!deskOpen && (
+            <button
+              onClick={() => setDeskOpen(true)}
+              className="hidden h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 md:flex"
+              aria-label="Open sidebar"
+              title="Open sidebar"
+            >
+              <PanelLeftOpen className="h-5 w-5" />
+            </button>
+          )}
+
           <div className="min-w-0 flex-1 truncate text-xs text-slate-500">
             <span className="hidden sm:inline">Smart Queue Control </span>
             <span className="mx-1.5 hidden text-slate-300 sm:inline">/</span>
@@ -129,12 +162,14 @@ export default function Layout() {
 function Brand() {
   return (
     <div className="flex items-center gap-2.5 px-5 py-4">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-        <Utensils className="h-4 w-4" />
-      </div>
+      <img
+        src="/logo.jpg"
+        alt="Rayudu Gari Military Hotel"
+        className="h-9 w-9 rounded-lg bg-white object-contain ring-1 ring-slate-200"
+      />
       <div>
-        <div className="text-sm font-semibold text-slate-900">Smart Queue</div>
-        <div className="text-xs text-slate-500">+ Express Food</div>
+        <div className="text-sm font-semibold text-slate-900">Rayudu Gari</div>
+        <div className="text-xs text-slate-500">Military Hotel</div>
       </div>
     </div>
   )

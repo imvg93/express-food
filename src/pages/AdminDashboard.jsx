@@ -184,7 +184,7 @@ function HeroHeader({ secondsSinceTick, onRefresh, derivedHero, dateLabel }) {
               <CalendarDays className="h-3.5 w-3.5 text-slate-500" /> {dateLabel}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-slate-700 ring-1 ring-slate-200">
-              <Building2 className="h-3.5 w-3.5 text-slate-500" /> Highway Spice Junction · NH-48
+              <Building2 className="h-3.5 w-3.5 text-slate-500" /> Rayudu Gari Military Hotel · NH-48
             </span>
             <LivePulseBadge secondsSinceTick={secondsSinceTick} />
             <button

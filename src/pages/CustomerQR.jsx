@@ -14,9 +14,11 @@ function Hero() {
       <div className="p-6 md:p-7">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
-              <Utensils className="h-5 w-5" />
-            </div>
+            <img
+              src="/logo.jpg"
+              alt={restaurant.name}
+              className="h-12 w-12 rounded-2xl bg-white object-contain ring-1 ring-slate-200"
+            />
             <div className="min-w-0">
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Welcome to</div>
               <div className="truncate text-xl font-bold tracking-tight text-slate-900">{restaurant.name}</div>
