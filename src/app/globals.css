@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #1B3A5C;
+  --color-primary-light: #2A5080;
+  --color-accent: #E67E22;
+  --color-accent-light: #F39C12;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+  --color-app-bg: #EEF1F5;
+  --color-sidebar: #0B1929;
+}
+
+:root {
+  --background: #EEF1F5;
+  --foreground: #0F172A;
+}
+
+html { font-size: 14px; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-be, "Be Vietnam Pro", system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern", "liga", "calt";
+  line-height: 1.55;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* ── Focus ── */
+*:focus-visible { outline: 2px solid #1B3A5C; outline-offset: 2px; border-radius: 4px; }
+
+/* ── Selection ── */
+::selection { background: #1B3A5C22; }
+
+/* ── Print ── */
+@media print { .no-print { display: none !important; } }
+
+/* ── recharts fix ── */
+.recharts-wrapper { font-family: var(--font-be, "Be Vietnam Pro", system-ui, sans-serif) !important; }
