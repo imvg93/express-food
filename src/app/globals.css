@@ -8,35 +8,51 @@
   --color-success: #16A34A;
   --color-warning: #D97706;
   --color-danger: #DC2626;
-  --color-app-bg: #EEF1F5;
+  --color-app-bg: #F8FAFC;
   --color-sidebar: #0B1929;
 }
 
 :root {
-  --background: #EEF1F5;
+  --background: #F8FAFC;
   --foreground: #0F172A;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-html { font-size: 14px; }
+/* ── Mobile-First Typography ── */
+html { 
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-be, "Be Vietnam Pro", system-ui, sans-serif);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "kern", "liga", "calt";
   line-height: 1.55;
+  letter-spacing: 0.3px;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* ── Smooth Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; transition: background var(--transition-fast); }
 ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
 
-/* ── Focus ── */
-*:focus-visible { outline: 2px solid #1B3A5C; outline-offset: 2px; border-radius: 4px; }
+/* ── Touch-Friendly Focus States ── */
+*:focus-visible { 
+  outline: 2px solid #1B3A5C; 
+  outline-offset: 2px; 
+  border-radius: 4px; 
+}
+
+button, input, select, textarea, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  transition: all var(--transition-fast);
+}
 
 /* ── Selection ── */
 ::selection { background: #1B3A5C22; }
@@ -44,5 +60,58 @@ body {
 /* ── Print ── */
 @media print { .no-print { display: none !important; } }
 
+/* ── Mobile-First Layout ── */
+@media (max-width: 768px) {
+  html { font-size: 13px; }
+  body { overflow-x: hidden; }
+  /* Add bottom padding for bottom navigation */
+  main { padding-bottom: 80px; }
+}
+
+/* ── Smooth Transitions ── */
+.transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+.transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* ── App-Like Scale Animation ── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.animate-scale-in { animation: scaleIn var(--transition-smooth); }
+.animate-slide-up { animation: slideUp var(--transition-smooth); }
+.animate-fade-in { animation: fadeIn var(--transition-fast); }
+.animate-bounce-subtle { animation: bounce-subtle 2s infinite; }
+
 /* ── recharts fix ── */
 .recharts-wrapper { font-family: var(--font-be, "Be Vietnam Pro", system-ui, sans-serif) !important; }
+
+/* ── Smooth Transitions for Cards ── */
+.card-hover {
+  transition: all var(--transition-normal);
+  will-change: transform, box-shadow;
+}
+
+.card-hover:active {
+  transform: scale(0.98);
+}
+
+/* ── Safe Area Support (iOS) ── */
+@supports (padding: max(0px)) {
+  body { padding-top: max(0px, env(safe-area-inset-top)); padding-left: max(0px, env(safe-area-inset-left)); padding-right: max(0px, env(safe-area-inset-right)); }
+}

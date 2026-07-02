@@ -24,10 +24,18 @@ const ROLE_META = {
   supervisor: { label: "Head Supervisor",      name: "Venkat Reddy",   initials: "VR", ring: "ring-emerald-400/50", bg: "bg-gradient-to-br from-emerald-400 to-teal-600" },
 };
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed?: boolean;
+  onToggle?: () => void;
+}
+
+export default function Sidebar({ collapsed: externalCollapsed, onToggle }: SidebarProps) {
   const { role } = useDemoStore();
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const collapsed = externalCollapsed !== undefined ? externalCollapsed : internalCollapsed;
+  const toggleCollapsed = onToggle || (() => setInternalCollapsed((v) => !v));
+  
   const navItems = ROLE_NAV[role] || ROLE_NAV.owner;
   const meta = ROLE_META[role];
 
@@ -155,9 +163,13 @@ export default function Sidebar() {
       )}
 
       {/* ── Collapse toggle ── */}
-      <div className="px-2 pb-3 shrink-0">
-        <button onClick={() => setCollapsed((v) => !v)}
-          className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-xl text-white/20 hover:text-white/50 hover:bg-white/5 transition-colors text-xs font-medium">
+      <div className="px-3 pb-3 shrink-0 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <button 
+          onClick={toggleCollapsed}
+          type="button"
+          className="w-full flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.08] active:bg-white/[0.12] transition-all duration-200 text-xs font-semibold"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
           {collapsed
             ? <ChevronRight className="w-4 h-4" />
             : <><ChevronLeft className="w-4 h-4" /><span>Collapse</span></>

@@ -8,6 +8,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import AddExpenseModal from "@/components/expenses/AddExpenseModal";
 import ExpenseDetailDrawer from "@/components/expenses/ExpenseDetailDrawer";
+import PaymentUploadModal from "@/components/expenses/PaymentUploadModal";
 import { useDemoStore } from "@/store/demoStore";
 import { formatCurrency, formatDate, getStatusLabel } from "@/lib/utils";
 import type { Expense, ExpenseCategory } from "@/types";
@@ -30,6 +31,7 @@ const QUICK: { label: string; icon: React.ReactNode; category: ExpenseCategory; 
 export default function SupervisorDashboard() {
   const { expenses } = useDemoStore();
   const [addModal, setAddModal] = useState<ExpenseCategory | null>(null);
+    const [paymentModal, setPaymentModal] = useState(false);
   const [sel, setSel] = useState<Expense | null>(null);
 
   const mine          = expenses.filter(e => e.submittedById === "u3");
@@ -54,7 +56,7 @@ export default function SupervisorDashboard() {
             </p>
             <p className="text-xs text-amber-600 mt-0.5">Upload before 6:00 PM — manager cannot verify without proof</p>
           </div>
-          <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100 shrink-0">
+          <Button variant="outline" size="sm" onClick={() => setPaymentModal(true)} className="border-amber-300 text-amber-700 hover:bg-amber-100 shrink-0">
             Upload Now
           </Button>
         </motion.div>
@@ -75,6 +77,31 @@ export default function SupervisorDashboard() {
       </div>
 
       {/* Quick Add */}
+
+            {/* Payment Upload Section - Center */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex justify-center py-6"
+            >
+              <button
+                onClick={() => setPaymentModal(true)}
+                className="flex flex-col items-center gap-4 w-full max-w-sm"
+              >
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
+                  <Upload className="w-10 h-10 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold text-slate-900">Upload Payment Slip</h3>
+                  <p className="text-sm text-slate-500 mt-1">Add payment details and supporting documents</p>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-blue-600 group">
+                  <span>Click to Upload</span>
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </div>
+              </button>
+            </motion.div>
+
       <Card>
         <CardHeader>
           <div><CardTitle>Quick Add Expense</CardTitle><p className="text-xs text-slate-400 mt-0.5">Click any category to open the entry form</p></div>
@@ -133,6 +160,7 @@ export default function SupervisorDashboard() {
           category={addModal} categoryLabel={QUICK.find(a => a.category === addModal)?.label || ""} />
       )}
       <ExpenseDetailDrawer expense={sel} open={!!sel} onClose={() => setSel(null)} />
+      <PaymentUploadModal isOpen={paymentModal} onClose={() => setPaymentModal(false)} />
     </div>
   );
 }

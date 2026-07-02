@@ -50,37 +50,37 @@ export default function OwnerDashboard() {
   };
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-5">
 
       {/* ── Alerts ── */}
       {(hotBudgets.length > 0 || missing.length > 0) && (
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-2.5">
           {hotBudgets.map(b => (
             <motion.div key={b.id} initial={{ opacity:0, x:-8 }} animate={{ opacity:1, x:0 }}
-              className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-2.5">
+              className="flex items-center gap-2 md:gap-2.5 bg-amber-50 border border-amber-200 rounded-2xl px-3 md:px-4 py-2">
               <div className="w-7 h-7 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
               </div>
-              <p className="text-sm font-semibold text-amber-800">
-                <span className="font-bold">{b.label}</span> budget at {Math.round((b.currentSpend/b.monthlyLimit)*100)}%
+              <p className="text-xs md:text-sm font-semibold text-amber-800">
+                <span className="font-bold">{b.label}</span> at {Math.round((b.currentSpend/b.monthlyLimit)*100)}%
               </p>
               <Link href="/dashboard/budgets"
-                className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200 rounded-lg px-2 py-1 hover:bg-amber-200 transition-colors">
+                className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200 rounded-lg px-2 py-1 hover:bg-amber-200 transition-colors ml-auto shrink-0">
                 Review
               </Link>
             </motion.div>
           ))}
           {missing.length > 0 && (
             <motion.div initial={{ opacity:0, x:-8 }} animate={{ opacity:1, x:0 }}
-              className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5">
+              className="flex items-center gap-2 md:gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-3 md:px-4 py-2">
               <div className="w-7 h-7 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
                 <Flame className="w-3.5 h-3.5 text-red-600" />
               </div>
-              <p className="text-sm font-semibold text-red-800">
-                <span className="font-bold">{missing.length} entries</span> missing bill proof — month cannot close
+              <p className="text-xs md:text-sm font-semibold text-red-800">
+                <span className="font-bold">{missing.length}</span> entries missing proof
               </p>
               <Link href="/dashboard/missing-proofs"
-                className="text-xs font-bold text-red-700 bg-red-100 border border-red-200 rounded-lg px-2 py-1 hover:bg-red-200 transition-colors">
+                className="text-xs font-bold text-red-700 bg-red-100 border border-red-200 rounded-lg px-2 py-1 hover:bg-red-200 transition-colors ml-auto shrink-0">
                 View
               </Link>
             </motion.div>
@@ -89,26 +89,26 @@ export default function OwnerDashboard() {
       )}
 
       {/* ── KPIs ── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <KPICard title="Today's Expenses" value={formatCurrency(todayTotal || 8420)}
-          subtitle="as of 6:00 PM today" trend={{ value:22, label:"vs yesterday" }}
+          subtitle="as of 6:00 PM" trend={{ value:22, label:"vs yesterday" }}
           icon={<DollarSign className="w-5 h-5 text-blue-600" />} iconBg="bg-blue-50" />
         <KPICard title="Month to Date" value={formatCurrency(214560)}
-          subtitle="June 2026" trend={{ value:8, label:"vs May 2026" }}
+          subtitle="June 2026" trend={{ value:8, label:"vs May" }}
           icon={<TrendingUp className="w-5 h-5 text-[#1B3A5C]" />} iconBg="bg-slate-100" />
-        <KPICard title="Pending Approvals" value={pending.length}
-          subtitle="awaiting action" alert={pending.length > 3 ? "warning" : undefined}
+        <KPICard title="Pending" value={pending.length}
+          subtitle="awaiting" alert={pending.length > 3 ? "warning" : undefined}
           icon={<CheckSquare className="w-5 h-5 text-amber-500" />} iconBg="bg-amber-50"
           onClick={() => toast.info("Navigate to Approvals to review all pending items.")} />
         <KPICard title="Missing Proofs" value={missing.length}
-          subtitle="follow-up required" alert={missing.length > 0 ? "danger" : undefined}
+          subtitle="follow-up" alert={missing.length > 0 ? "danger" : undefined}
           icon={<AlertCircle className="w-5 h-5 text-red-500" />} iconBg="bg-red-50"
           onClick={() => toast.info("Navigate to Missing Proofs.")} />
       </div>
 
       {/* ── Charts ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
-        <Card className="xl:col-span-3">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 auto-rows-min">
+        <Card className="lg:col-span-3">
           <CardHeader>
             <div>
               <CardTitle>Daily Expense Trend</CardTitle>
@@ -118,7 +118,7 @@ export default function OwnerDashboard() {
           </CardHeader>
           <ExpenseLineChart data={report.dailyTrend} />
         </Card>
-        <Card className="xl:col-span-2">
+        <Card className="lg:col-span-2">
           <CardHeader>
             <div>
               <CardTitle>Expense by Category</CardTitle>
@@ -134,14 +134,14 @@ export default function OwnerDashboard() {
         <CardHeader>
           <div>
             <CardTitle>Budget Utilization</CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">June 2026 — spend vs. monthly limit</p>
+            <p className="text-xs text-slate-400 mt-0.5">June 2026 — spend vs. limit</p>
           </div>
           <Link href="/dashboard/budgets"
             className="flex items-center gap-1 text-sm font-semibold text-[#1B3A5C] hover:text-[#E67E22] transition-colors">
             Manage <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </CardHeader>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {budgets.map(b => {
             const pct = Math.round((b.currentSpend / b.monthlyLimit) * 100);
             return (

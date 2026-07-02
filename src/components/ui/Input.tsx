@@ -10,24 +10,25 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, leftIcon, className, ...props }, ref) => {
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         {label && (
           <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{label}</label>
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 flex items-center justify-center pointer-events-none">
               {leftIcon}
             </div>
           )}
           <input
             ref={ref}
             className={cn(
-              "w-full h-9 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl",
+              "w-full h-11 md:h-9 px-4 py-3 md:py-2 text-base md:text-sm bg-white border border-slate-200 rounded-xl",
               "text-slate-800 placeholder-slate-400 font-medium",
               "focus:outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C]/60",
               "transition-all duration-150",
-              leftIcon && "pl-9",
+              "min-h-[44px] md:min-h-auto",
+              leftIcon && "pl-11 md:pl-9",
               error && "border-red-300 focus:border-red-400 focus:ring-red-300/20",
               className
             )}
@@ -52,17 +53,18 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, placeholder, className, ...props }, ref) => {
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         {label && (
           <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{label}</label>
         )}
         <select
           ref={ref}
           className={cn(
-            "w-full h-9 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl",
+            "w-full h-11 md:h-9 px-4 py-3 md:py-2 text-base md:text-sm bg-white border border-slate-200 rounded-xl",
             "text-slate-800 font-medium",
             "focus:outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C]/60",
             "transition-all duration-150 cursor-pointer",
+            "min-h-[44px] md:min-h-auto",
             error && "border-red-300",
             className
           )}
@@ -90,17 +92,17 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, className, ...props }, ref) => {
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         {label && (
           <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{label}</label>
         )}
         <textarea
           ref={ref}
           className={cn(
-            "w-full px-3 py-2.5 text-sm bg-white border border-slate-200 rounded-xl",
+            "w-full px-4 py-3 md:py-2.5 text-base md:text-sm bg-white border border-slate-200 rounded-xl",
             "text-slate-800 placeholder-slate-400 font-medium resize-none",
             "focus:outline-none focus:ring-2 focus:ring-[#1B3A5C]/20 focus:border-[#1B3A5C]/60",
-            "transition-all duration-150",
+            "transition-all duration-150 min-h-[120px] md:min-h-auto",
             error && "border-red-300",
             className
           )}
