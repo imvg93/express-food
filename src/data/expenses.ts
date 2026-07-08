@@ -1,6 +1,13 @@
-import type { Expense, PettyCashEntry } from "@/types";
+import type { Expense, PettyCashEntry, PaymentRecord, PaymentStatus } from "@/types";
 
-export const EXPENSES: Expense[] = [
+// Seed shape: the raw entries below omit the payables fields, which are
+// derived deterministically in enrichExpense() to keep the seed readable.
+type SeedExpense = Omit<
+  Expense,
+  "paymentStatus" | "amountPaid" | "payments" | "invoiceDate" | "dueDate" | "creditDays" | "branch" | "attachments"
+>;
+
+const RAW_EXPENSES: SeedExpense[] = [
   // ─── GOODS ───────────────────────────────────────────────────────────────
   {
     id: "EXP-G001",
@@ -629,6 +636,97 @@ export const EXPENSES: Expense[] = [
     ],
   },
 ];
+
+// ─── Payables enrichment ─────────────────────────────────────────────────────
+// Reference "today" for the demo — kept in sync with lib/utils daysSince/daysUntil.
+export const TODAY = "2026-06-12";
+
+const CREDIT_DAYS_BY_CATEGORY: Record<string, number> = {
+  goods: 7,
+  maintenance: 15,
+  utilities: 10,
+  cleaning: 15,
+  marketing: 30,
+  transport: 7,
+  "petty-cash": 0,
+};
+
+// Explicit overrides to showcase varied payment states in the demo.
+// `splits` lists successive payment amounts; status is derived from their sum.
+const PAYMENT_OVERRIDES: Record<
+  string,
+  { status?: PaymentStatus; splits?: number[]; creditDays?: number }
+> = {
+  "EXP-G005": { splits: [2000] },          // partially paid (₹2,000 of ₹4,960)
+  "EXP-G009": { splits: [1500] },          // partially paid
+  "EXP-U001": { splits: [10000, 8400] },   // paid across two installments
+  "EXP-M003": { status: "unpaid" },        // verified, bill on file, awaiting payment
+  "EXP-M004": { status: "unpaid" },        // overdue (invoice 22-May, 15-day terms)
+  "EXP-C003": { status: "unpaid" },        // due soon
+  "EXP-MK002": { splits: [1000] },         // partially paid
+};
+
+function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function makePayment(e: SeedExpense, amount: number, date: string, id: string): PaymentRecord {
+  const proofExt = e.paymentMode === "Cheque" ? "pdf" : "jpg";
+  return {
+    id,
+    date,
+    amount,
+    method: e.paymentMode,
+    reference: e.paymentRef ?? `${e.paymentMode.replace(/\s/g, "").toUpperCase()}-${id}`,
+    paidBy: e.submittedBy,
+    hasProof: true,
+    proofName: `Payment_${id}.${proofExt}`,
+    notes: undefined,
+  };
+}
+
+function enrichExpense(e: SeedExpense): Expense {
+  const ov = PAYMENT_OVERRIDES[e.id];
+  const creditDays = ov?.creditDays ?? CREDIT_DAYS_BY_CATEGORY[e.category] ?? 15;
+  const invoiceDate = e.date;
+  const dueDate = addDays(invoiceDate, creditDays);
+
+  let payments: PaymentRecord[] = [];
+  let amountPaid = 0;
+  let paymentStatus: PaymentStatus;
+
+  if (ov?.splits) {
+    payments = ov.splits.map((amt, i) =>
+      makePayment(e, amt, addDays(e.date, i * 2), `${e.id}-P${i + 1}`)
+    );
+    amountPaid = ov.splits.reduce((s, a) => s + a, 0);
+    paymentStatus = amountPaid >= e.amount ? "paid" : "partially-paid";
+  } else {
+    paymentStatus = ov?.status ?? (e.status === "owner-approved" ? "paid" : "unpaid");
+    if (paymentStatus === "paid") {
+      amountPaid = e.amount;
+      payments = [makePayment(e, e.amount, e.date, `${e.id}-P1`)];
+    } else if (paymentStatus === "partially-paid") {
+      amountPaid = Math.round(e.amount * 0.4);
+      payments = [makePayment(e, amountPaid, e.date, `${e.id}-P1`)];
+    }
+  }
+
+  return {
+    ...e,
+    paymentStatus,
+    amountPaid,
+    payments,
+    invoiceDate,
+    dueDate,
+    creditDays,
+    branch: "Main Branch",
+  };
+}
+
+export const EXPENSES: Expense[] = RAW_EXPENSES.map(enrichExpense);
 
 export const PETTY_CASH_ENTRIES: PettyCashEntry[] = [
   {

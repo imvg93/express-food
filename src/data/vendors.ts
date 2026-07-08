@@ -1,6 +1,6 @@
 import type { Vendor } from "@/types";
 
-export const VENDORS: Vendor[] = [
+const RAW_VENDORS: Vendor[] = [
   {
     id: "v1",
     name: "RK Poultry Farms",
@@ -331,5 +331,56 @@ export const VENDORS: Vendor[] = [
     ],
   },
 ];
+
+// ─── Vendor AP-field enrichment ──────────────────────────────────────────────
+const CREDIT_DAYS_BY_CATEGORY: Record<string, number> = {
+  goods: 7,
+  maintenance: 15,
+  utilities: 10,
+  cleaning: 15,
+  marketing: 30,
+  transport: 7,
+  "petty-cash": 0,
+};
+
+const TERMS_LABEL: Record<number, string> = {
+  0: "Payment on receipt",
+  7: "Net 7 days",
+  10: "Net 10 days",
+  15: "Net 15 days",
+  30: "Net 30 days",
+};
+
+function slugEmail(name: string): string {
+  const handle = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .slice(0, 14);
+  return `accounts@${handle || "vendor"}.co.in`;
+}
+
+function panFromGstin(gstin?: string): string | undefined {
+  // GSTIN embeds the PAN at characters 3–12.
+  return gstin ? gstin.slice(2, 12) : undefined;
+}
+
+function enrichVendor(v: Vendor, i: number): Vendor {
+  const creditDays = CREDIT_DAYS_BY_CATEGORY[v.category] ?? 15;
+  const govBody = v.gstin === undefined && ["TSSPDCL", "GHMC Water Board"].includes(v.name);
+  return {
+    ...v,
+    vendorCode: `VND-${String(i + 1).padStart(3, "0")}`,
+    email: v.email ?? slugEmail(v.name),
+    pan: v.pan ?? panFromGstin(v.gstin),
+    billingAddress: v.billingAddress ?? `${v.location}, Telangana, India`,
+    bankDetails:
+      v.bankDetails ??
+      (govBody ? "Government billing account" : `HDFC Bank · A/C ••••${1000 + i * 7} · IFSC HDFC000${1200 + i}`),
+    paymentTerms: v.paymentTerms ?? TERMS_LABEL[creditDays] ?? `Net ${creditDays} days`,
+    creditDays: v.creditDays ?? creditDays,
+  };
+}
+
+export const VENDORS: Vendor[] = RAW_VENDORS.map(enrichVendor);
 
 export const getVendorById = (id: string) => VENDORS.find((v) => v.id === id);

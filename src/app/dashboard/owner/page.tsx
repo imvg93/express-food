@@ -17,10 +17,18 @@ import CategoryDonutChart from "@/components/charts/CategoryDonutChart";
 import ExpenseDetailDrawer from "@/components/expenses/ExpenseDetailDrawer";
 import { useDemoStore } from "@/store/demoStore";
 import { MONTHLY_REPORTS } from "@/data/reports";
-import { formatCurrency, formatDate, getStatusLabel } from "@/lib/utils";
+import { formatCurrency, formatDate, getStatusLabel, getPaymentStatusLabel, paymentStatusVariant } from "@/lib/utils";
+import { getPayablesSummary } from "@/lib/payables";
+import { CreditCard, Wallet, CalendarClock, Calendar } from "lucide-react";
 import type { Expense } from "@/types";
 
 const report = MONTHLY_REPORTS[0];
+
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function monthLabel(ym: string): string {
+  const [y, m] = ym.split("-");
+  return `${MONTH_NAMES[Number(m) - 1]} ${y}`;
+}
 
 const STATUS_VARIANT: Record<string, "success" | "warning" | "danger" | "info" | "purple" | "gray"> = {
   "owner-approved": "success", submitted: "gray", "proof-uploaded": "info",
@@ -37,12 +45,33 @@ export default function OwnerDashboard() {
   const { expenses, budgets, updateExpenseStatus } = useDemoStore();
   const [sel, setSel] = useState<Expense | null>(null);
 
+  // ── Period filter (month + date range) ──
+  const [month, setMonth] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const monthOptions = Array.from(new Set(expenses.map(e => e.date.slice(0, 7)))).sort().reverse();
+  const useRange = !!(fromDate || toDate);
+  const inRange = (d: string) => {
+    if (useRange) {
+      if (fromDate && d < fromDate) return false;
+      if (toDate && d > toDate) return false;
+      return true;
+    }
+    return month === "all" ? true : d.startsWith(month);
+  };
+  const filtered = expenses.filter(e => inRange(e.date));
+  const periodLabel = useRange
+    ? `${fromDate ? formatDate(fromDate) : "start"} → ${toDate ? formatDate(toDate) : "today"}`
+    : month === "all" ? "All time" : monthLabel(month);
+
   const pending     = expenses.filter(e => ["submitted","proof-uploaded","manager-verified"].includes(e.status));
   const missing     = expenses.filter(e => !e.hasBillProof && e.status !== "owner-approved" && e.status !== "rejected");
-  const todayTotal  = expenses.filter(e => e.date === "2026-06-12").reduce((s,e) => s + e.amount, 0);
-  const recent      = [...expenses].sort((a,b) => b.date.localeCompare(a.date)).slice(0,5);
+  const recent      = [...filtered].sort((a,b) => b.date.localeCompare(a.date)).slice(0,5);
   const forOwner    = expenses.filter(e => e.status === "manager-verified");
   const hotBudgets  = budgets.filter(b => b.currentSpend / b.monthlyLimit >= 0.8);
+  const payables    = getPayablesSummary(filtered);
+  const totalAmount = filtered.reduce((s, e) => s + e.amount, 0);
 
   const approve = (exp: Expense) => {
     updateExpenseStatus(exp.id, "owner-approved", undefined, "Rayudu Gari");
@@ -88,13 +117,51 @@ export default function OwnerDashboard() {
         </div>
       )}
 
+      {/* ── Period Filter ── */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-3 md:p-4 flex flex-col md:flex-row md:items-center gap-3" style={{ boxShadow: "0 1px 4px rgba(15,23,42,0.06)" }}>
+        <div className="flex items-center gap-2 shrink-0">
+          <Calendar className="w-4 h-4 text-[#1B3A5C]" />
+          <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Period</span>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap flex-1">
+          <select
+            value={month}
+            onChange={(e) => { setMonth(e.target.value); setFromDate(""); setToDate(""); }}
+            className="h-9 px-3 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none cursor-pointer font-semibold"
+          >
+            <option value="all">All Months</option>
+            {monthOptions.map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
+          </select>
+          <span className="text-xs text-slate-400 font-medium">or</span>
+          <label className="text-[11px] font-semibold text-slate-400">From</label>
+          <input type="date" value={fromDate}
+            onChange={(e) => { setFromDate(e.target.value); setMonth("all"); }}
+            className="h-9 px-3 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none font-medium" />
+          <label className="text-[11px] font-semibold text-slate-400">To</label>
+          <input type="date" value={toDate}
+            onChange={(e) => { setToDate(e.target.value); setMonth("all"); }}
+            className="h-9 px-3 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none font-medium" />
+          {(month !== "all" || useRange) && (
+            <button
+              onClick={() => { setMonth("all"); setFromDate(""); setToDate(""); }}
+              className="h-9 px-3 text-xs font-bold text-slate-500 hover:text-red-500 rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className="text-xs font-semibold text-slate-500 shrink-0">
+          <span className="text-slate-800 font-bold">{filtered.length}</span> entries · {periodLabel}
+        </div>
+      </div>
+
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <KPICard title="Today's Expenses" value={formatCurrency(todayTotal || 8420)}
-          subtitle="as of 6:00 PM" trend={{ value:22, label:"vs yesterday" }}
+        <KPICard title="Total Expenses" value={formatCurrency(totalAmount)}
+          subtitle={periodLabel}
           icon={<DollarSign className="w-5 h-5 text-blue-600" />} iconBg="bg-blue-50" />
-        <KPICard title="Month to Date" value={formatCurrency(214560)}
-          subtitle="June 2026" trend={{ value:8, label:"vs May" }}
+        <KPICard title="Outstanding" value={formatCurrency(payables.outstanding)}
+          subtitle={`${payables.overdueCount} overdue`} alert={payables.overdue > 0 ? "danger" : undefined}
           icon={<TrendingUp className="w-5 h-5 text-[#1B3A5C]" />} iconBg="bg-slate-100" />
         <KPICard title="Pending" value={pending.length}
           subtitle="awaiting" alert={pending.length > 3 ? "warning" : undefined}
@@ -105,6 +172,39 @@ export default function OwnerDashboard() {
           icon={<AlertCircle className="w-5 h-5 text-red-500" />} iconBg="bg-red-50"
           onClick={() => toast.info("Navigate to Missing Proofs.")} />
       </div>
+
+      {/* ── Payables Overview ── */}
+      <Card padding="none">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <CardTitle>Payables Overview</CardTitle>
+            <p className="text-xs text-slate-400 mt-0.5">Accounts payable · {periodLabel}</p>
+          </div>
+          <Link href="/dashboard/vendors" className="flex items-center gap-1 text-sm font-semibold text-[#1B3A5C] hover:text-[#E67E22] transition-colors">
+            Vendor Ledger <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 divide-x divide-y lg:divide-y-0 divide-slate-100">
+          {[
+            { label: "Total Outstanding", value: formatCurrency(payables.outstanding), icon: <CreditCard className="w-4 h-4 text-[#1B3A5C]" />, tone: "text-[#1B3A5C]" },
+            { label: "Overdue", value: formatCurrency(payables.overdue), icon: <AlertTriangle className="w-4 h-4 text-red-500" />, tone: "text-red-600", sub: `${payables.overdueCount} bills` },
+            { label: "Due in 7 Days", value: formatCurrency(payables.dueSoon), icon: <CalendarClock className="w-4 h-4 text-amber-500" />, tone: "text-amber-600" },
+            { label: "Total Paid", value: formatCurrency(payables.paid), icon: <CheckCheck className="w-4 h-4 text-emerald-500" />, tone: "text-emerald-600" },
+            { label: "Total Billed", value: formatCurrency(payables.total), icon: <Wallet className="w-4 h-4 text-slate-500" />, tone: "text-slate-800" },
+          ].map((k) => (
+            <div key={k.label} className="p-4">
+              <div className="flex items-center gap-2 mb-2">{k.icon}<span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{k.label}</span></div>
+              <p className={`text-lg font-extrabold ${k.tone}`}>{k.value}</p>
+              {k.sub && <p className="text-[11px] font-semibold text-slate-400 mt-0.5">{k.sub}</p>}
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t border-slate-100 flex items-center gap-2 flex-wrap bg-slate-50/60">
+          <Badge variant="danger" dot>{payables.counts.unpaid} Unpaid</Badge>
+          <Badge variant="warning" dot>{payables.counts["partially-paid"]} Partially Paid</Badge>
+          <Badge variant="success" dot>{payables.counts.paid} Paid</Badge>
+        </div>
+      </Card>
 
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 auto-rows-min">
@@ -187,7 +287,7 @@ export default function OwnerDashboard() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-extrabold text-slate-900">{formatCurrency(exp.amount)}</p>
-                  <Badge variant={STATUS_VARIANT[exp.status]} className="mt-1" dot>{getStatusLabel(exp.status)}</Badge>
+                  <Badge variant={paymentStatusVariant(exp.paymentStatus)} className="mt-1" dot>{getPaymentStatusLabel(exp.paymentStatus)}</Badge>
                 </div>
               </div>
             ))}

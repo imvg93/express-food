@@ -18,6 +18,60 @@ export type ApprovalStatus =
 
 export type PaymentMode = "Cash" | "UPI" | "Bank Transfer" | "Cheque";
 
+// ─── Payment / Payables ──────────────────────────────────────────────────────
+export type PaymentStatus = "unpaid" | "partially-paid" | "paid";
+
+export interface PaymentRecord {
+  id: string;
+  date: string;
+  amount: number;
+  method: PaymentMode;
+  reference?: string;      // Transaction / UPI / cheque reference number
+  paidBy: string;
+  hasProof: boolean;       // Payment proof attached (mandatory for a "paid" record)
+  proofName?: string;      // e.g. "UPI_Screenshot_2606.jpg"
+  notes?: string;
+}
+
+export type AttachmentType =
+  | "bill"
+  | "quotation"
+  | "purchase-order"
+  | "delivery-challan"
+  | "warranty"
+  | "payment-proof"
+  | "other";
+
+export interface Attachment {
+  id: string;
+  type: AttachmentType;
+  name: string;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
+export type AuditAction =
+  | "expense-created"
+  | "expense-updated"
+  | "payment-added"
+  | "payment-edited"
+  | "payment-deleted"
+  | "proof-uploaded"
+  | "bill-uploaded"
+  | "status-changed";
+
+export interface AuditEntry {
+  id: string;
+  expenseId: string;
+  expenseLabel: string;
+  action: AuditAction;
+  label: string;
+  user: string;
+  timestamp: string;
+  previousValue?: string;
+  newValue?: string;
+}
+
 export interface ApprovalStep {
   stage: ApprovalStatus;
   label: string;
@@ -41,6 +95,15 @@ export interface Expense {
   paymentMode: PaymentMode;
   paymentRef?: string;
   status: ApprovalStatus;
+  // ── Payment / Payables ──
+  paymentStatus: PaymentStatus;
+  amountPaid: number;            // derived from payments[], stored for convenience
+  payments: PaymentRecord[];
+  invoiceDate?: string;
+  dueDate?: string;
+  creditDays?: number;
+  branch?: string;
+  attachments?: Attachment[];
   submittedBy: string;
   submittedById: string;
   hasBillProof: boolean;
@@ -73,10 +136,17 @@ export interface Vendor {
   id: string;
   name: string;
   category: ExpenseCategory;
+  vendorCode?: string;
   contactPerson?: string;
   phone: string;
+  email?: string;
   location: string;
   gstin?: string;
+  pan?: string;
+  billingAddress?: string;
+  bankDetails?: string;
+  paymentTerms?: string;
+  creditDays?: number;
   totalPaid: number;
   transactionCount: number;
   lastPaymentDate: string;
@@ -84,6 +154,18 @@ export interface Vendor {
   isActive: boolean;
   tags?: string[];
   paymentHistory: { month: string; amount: number }[];
+}
+
+// Rollup computed from a vendor's expenses (see lib/payables.ts)
+export interface VendorOutstanding {
+  totalPurchase: number;
+  totalPaid: number;
+  totalPending: number;
+  lastPaymentDate?: string;
+  lastPaymentAmount?: number;
+  pendingBills: number;
+  overdueAmount: number;
+  upcomingDue: number;      // amount due within the next 7 days
 }
 
 export interface User {

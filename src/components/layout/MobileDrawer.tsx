@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import {
   LayoutDashboard, CheckSquare, ShoppingCart, Wrench, Zap, Sparkles, Megaphone,
   Truck, Wallet, BarChart3, FileText, TrendingDown, Shield, PieChart, AlertCircle, Bell,
-  Settings, Upload, Building2, Receipt,
+  Settings, Upload, Building2, Receipt, History,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDemoStore } from "@/store/demoStore";
@@ -16,7 +16,7 @@ import { ROLE_NAV } from "@/lib/constants";
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard, CheckSquare, Receipt, ShoppingCart, Wrench, Zap, Sparkles, Megaphone,
   Truck, Wallet, BarChart3, FileText, TrendingDown, Shield, PieChart, AlertCircle, Bell,
-  Settings, Upload, Building2,
+  Settings, Upload, Building2, History,
 };
 
 const ROLE_META = {

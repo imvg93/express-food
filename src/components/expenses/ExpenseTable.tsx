@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
-import { formatCurrency, formatDate, getStatusLabel } from "@/lib/utils";
+import { formatCurrency, formatDate, getStatusLabel, getPaymentStatusLabel, paymentStatusVariant } from "@/lib/utils";
+import { isOverdue, remainingAmount, hasBill } from "@/lib/payables";
 import type { Expense, ApprovalStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,8 @@ interface Props {
 export default function ExpenseTable({ expenses, onRowClick, onAdd, title, totalThisMonth }: Props) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [payFilter, setPayFilter] = useState("all");
+  const [docFilter, setDocFilter] = useState("all");
   const [sortField, setSortField] = useState<"date" | "amount">("date");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [page, setPage] = useState(1);
@@ -38,8 +41,18 @@ export default function ExpenseTable({ expenses, onRowClick, onAdd, title, total
   const filtered = expenses
     .filter((e) => {
       const q = search.toLowerCase();
+      const payMatch =
+        payFilter === "all" ||
+        (payFilter === "overdue" ? isOverdue(e) : e.paymentStatus === payFilter);
+      const docMatch =
+        docFilter === "all" ||
+        (docFilter === "bill" && hasBill(e)) ||
+        (docFilter === "no-bill" && !hasBill(e)) ||
+        (docFilter === "proof" && e.payments.some((p) => p.hasProof));
       return (
         (statusFilter === "all" || e.status === statusFilter) &&
+        payMatch &&
+        docMatch &&
         (!q || e.itemDescription.toLowerCase().includes(q) || e.vendorName.toLowerCase().includes(q) || e.id.toLowerCase().includes(q))
       );
     })
@@ -104,6 +117,27 @@ export default function ExpenseTable({ expenses, onRowClick, onAdd, title, total
           <option value="owner-approved">Approved</option>
           <option value="rejected">Rejected</option>
         </select>
+        <select
+          value={payFilter}
+          onChange={(e) => { setPayFilter(e.target.value); setPage(1); }}
+          className="h-9 md:h-8 px-3 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none cursor-pointer font-medium flex-1 md:flex-none"
+        >
+          <option value="all">All Payments</option>
+          <option value="unpaid">Unpaid</option>
+          <option value="partially-paid">Partially Paid</option>
+          <option value="paid">Paid</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <select
+          value={docFilter}
+          onChange={(e) => { setDocFilter(e.target.value); setPage(1); }}
+          className="h-9 md:h-8 px-3 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none cursor-pointer font-medium flex-1 md:flex-none"
+        >
+          <option value="all">All Documents</option>
+          <option value="bill">Bill Available</option>
+          <option value="no-bill">No Bill</option>
+          <option value="proof">Payment Proof</option>
+        </select>
         <span className="text-sm font-medium text-slate-400">{filtered.length} records</span>
       </div>
 
@@ -127,7 +161,7 @@ export default function ExpenseTable({ expenses, onRowClick, onAdd, title, total
                       { label: "Description", field: null },
                       { label: "Vendor", field: null },
                       { label: "Amount", field: "amount" as const },
-                      { label: "Mode", field: null },
+                      { label: "Payment", field: null },
                       { label: "Status", field: null },
                       { label: "", field: null },
                     ].map(({ label, field }, i) => (
@@ -165,7 +199,16 @@ export default function ExpenseTable({ expenses, onRowClick, onAdd, title, total
                       <td className="px-5 py-3.5 text-sm font-extrabold text-slate-900 whitespace-nowrap">
                         {formatCurrency(expense.amount)}
                       </td>
-                      <td className="px-5 py-3.5 text-sm text-slate-500 whitespace-nowrap">{expense.paymentMode}</td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <Badge variant={paymentStatusVariant(expense.paymentStatus)} dot>
+                          {getPaymentStatusLabel(expense.paymentStatus)}
+                        </Badge>
+                        {isOverdue(expense) ? (
+                          <p className="text-[10px] font-bold text-red-500 mt-1">Overdue · {formatCurrency(remainingAmount(expense))}</p>
+                        ) : remainingAmount(expense) > 0 ? (
+                          <p className="text-[10px] font-semibold text-slate-400 mt-1">{formatCurrency(remainingAmount(expense))} due</p>
+                        ) : null}
+                      </td>
                       <td className="px-5 py-3.5 whitespace-nowrap">
                         <Badge variant={statusVariant[expense.status]} dot>
                           {getStatusLabel(expense.status)}
@@ -219,9 +262,19 @@ export default function ExpenseTable({ expenses, onRowClick, onAdd, title, total
                       <span className="font-semibold text-slate-800">{formatDate(expense.date)}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500">Mode</span>
-                      <span className="font-semibold text-slate-800">{expense.paymentMode}</span>
+                      <span className="text-slate-500">Payment</span>
+                      <Badge variant={paymentStatusVariant(expense.paymentStatus)} dot>
+                        {getPaymentStatusLabel(expense.paymentStatus)}
+                      </Badge>
                     </div>
+                    {remainingAmount(expense) > 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-500">Balance</span>
+                        <span className={cn("font-bold", isOverdue(expense) ? "text-red-600" : "text-slate-800")}>
+                          {formatCurrency(remainingAmount(expense))}{isOverdue(expense) ? " · Overdue" : ""}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Card Footer */}

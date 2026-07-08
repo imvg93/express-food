@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { ApprovalStatus } from "@/types";
+import type { ApprovalStatus, PaymentStatus } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -50,6 +50,25 @@ export function getStatusLabel(status: ApprovalStatus): string {
     case "manager-verified": return "Awaiting Owner";
     case "owner-approved": return "Approved";
     case "rejected": return "Rejected";
+  }
+}
+
+// ─── Payment status helpers ──────────────────────────────────────────────────
+export function getPaymentStatusLabel(status: PaymentStatus): string {
+  switch (status) {
+    case "paid": return "Paid";
+    case "partially-paid": return "Partially Paid";
+    case "unpaid": return "Unpaid";
+  }
+}
+
+export function paymentStatusVariant(
+  status: PaymentStatus
+): "success" | "warning" | "danger" | "info" | "purple" | "gray" {
+  switch (status) {
+    case "paid": return "success";
+    case "partially-paid": return "warning";
+    case "unpaid": return "danger";
   }
 }
 
